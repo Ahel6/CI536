@@ -12,45 +12,50 @@ public class RoomSpawner : MonoBehaviour
     void Start()
     {
         templates = GameObject.FindGameObjectWithTag("Rooms").GetComponent<RoomTemplates>();
-        Invoke("SpawnRoom", 0.5f);
+        Invoke("SpawnRoom", 0.1f);
     }
 
     // Update is called once per frame
     void SpawnRoom()
     {
-        if (hasSpawned == false)
+        if (hasSpawned == false) 
         {
             switch (direction)
             {
                 //spawn a room with a door to match (so right for left, up for down etc)
                 case 1:
-                    rand = Random.Range(0, 8);
+                    rand = Random.Range(0, 12);
                     Instantiate(templates.downRooms[rand], transform.position, Quaternion.identity);
+                    hasSpawned = true;
                     break;
                 case 2:
-                    rand = Random.Range(0, 8);
+                    rand = Random.Range(0, 12);
                     Instantiate(templates.leftRooms[rand], transform.position, Quaternion.identity);
+                    hasSpawned = true;
                     break;
                 case 3:
-                    rand = Random.Range(0, 8);
+                    rand = Random.Range(0, 12);
                     Instantiate(templates.upRooms[rand], transform.position, Quaternion.identity);
+                    hasSpawned = true;
                     break;
                 case 4:
-                    rand = Random.Range(0, 8);
+                    rand = Random.Range(0, 12);
                     Instantiate(templates.rightRooms[rand], transform.position, Quaternion.identity);
+                    hasSpawned = true;
                     break;
             }
-            hasSpawned = true;
+            
         }
 
     }
 
-    void OnTriggerEnter2D(Collider2D other)
+
+    void OnTriggerEnter2D(Collider2D other) //prevent room overlapping
     {
-        if (other.CompareTag("SpawnPoint") && other.GetComponent<RoomSpawner>().hasSpawned == true)
-        {
+        if (other.CompareTag("SpawnPoint"))
+        { if(other.GetComponent<RoomSpawner>().hasSpawned == false && hasSpawned == false)
             Destroy(gameObject);
         }
-
+        hasSpawned = true;
     }
 }
