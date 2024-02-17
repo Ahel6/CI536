@@ -1,24 +1,32 @@
 package ci536.singleplayergame.entity;
 
+import ci536.singleplayergame.game.GameObject;
 import ci536.singleplayergame.game.Level;
+import ci536.singleplayergame.math.AABB;
+import ci536.singleplayergame.math.Vector2f;
+import ci536.singleplayergame.tile.Updatable;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class Entity {
+public abstract class Entity extends GameObject implements Updatable {
     private final Map<EntityAttribute<?>, EntityAttribute.AttributeValue<?>> attributes = new HashMap<>();
     private final EntityType<?> type;
+    protected final AABB.Mutable boundingBox;
     private Level level;
-    protected float xPos, yPos;
 
     public Entity(EntityType<?> type, float xPos, float yPos) {
         this.type = type;
-        this.xPos = xPos;
-        this.yPos = yPos;
+        this.boundingBox = new AABB.Mutable(xPos, yPos, type.getSize().getX(), type.getSize().getY());
     }
 
     public Entity(EntityType<?> type) {
         this(type, 0, 0);
+    }
+
+    @Override
+    public AABB getBoundingBox() {
+        return this.boundingBox;
     }
 
     public EntityType<?> getType() {
@@ -33,20 +41,16 @@ public abstract class Entity {
         this.level = level;
     }
 
-    public float getXPos() {
-        return xPos;
+    public double getXPos() {
+        return this.boundingBox.getX();
     }
 
-    public float getYPos() {
-        return yPos;
+    public double getYPos() {
+        return this.boundingBox.getY();
     }
 
-    public void setXPos(float xPos) {
-        this.xPos = xPos;
-    }
-
-    public void setYPos(float yPos) {
-        this.yPos = yPos;
+    public Vector2f getSize() {
+        return this.type.getSize();
     }
 
     public boolean isDead() {
@@ -65,8 +69,11 @@ public abstract class Entity {
     }
 
     public <T extends Number> void setAttributeValue(EntityAttribute<T> attribute, T value) {
-        this.attributes.put(attribute, new EntityAttribute.AttributeValue<T>(attribute, value));
+        this.attributes.put(attribute, new EntityAttribute.AttributeValue<>(attribute, value));
     }
 
-    public abstract void update();
+    public void setPosition(double x, double y) {
+        this.boundingBox.setX(x);
+        this.boundingBox.setY(y);
+    }
 }

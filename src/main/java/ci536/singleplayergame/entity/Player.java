@@ -14,6 +14,11 @@ public class Player extends Entity {
         setAttributeValue(EntityAttribute.SPEED, 5.0f);
     }
 
+    public Player(int x, int y) {
+        this();
+        setPosition(x, y);
+    }
+
     @Override
     public void update() {
 
@@ -21,8 +26,7 @@ public class Player extends Entity {
 
     public void takeInput(float x, float y) {
         float speed = getAttributeValue(EntityAttribute.SPEED, Float.class);
-        setXPos(this.xPos + x * speed);
-        setYPos(this.yPos + y * speed);
+        setPosition(getXPos() + (x * speed), getYPos() + (y * speed));
     }
 
     public boolean isPaused() {

@@ -34,15 +34,22 @@ public class Input {
             if (!currentlyActiveKeys.containsKey(codeString)) {
                 currentlyActiveKeys.put(codeString, true);
             }
+
+            for (EventHandler<KeyEvent> handler : keyPressedHandlers) {
+                handler.handle(event);
+            }
         });
 
-        scene.setOnKeyReleased(event ->
-                currentlyActiveKeys.remove(event.getCode().toString())
-        );
+        scene.setOnKeyReleased(event -> {
+            currentlyActiveKeys.remove(event.getCode().toString());
+            for (EventHandler<KeyEvent> handler : keyReleasedHandlers) {
+                handler.handle(event);
+            }
+        });
 
         scene.setOnMouseMoved(event -> {
-            mouseX = (int) event.getX();
-            mouseY = (int) event.getY();
+            this.mouseX = (int) event.getX();
+            this.mouseY = (int) event.getY();
 
             for (EventHandler<MouseEvent> handler : mouseMovedHandlers) {
                 handler.handle(event);
@@ -66,18 +73,6 @@ public class Input {
 
         scene.setOnMouseReleased(event -> {
             for (EventHandler<MouseEvent> handler : mouseReleasedHandlers) {
-                handler.handle(event);
-            }
-        });
-
-        scene.setOnKeyPressed(event -> {
-            for (EventHandler<KeyEvent> handler : keyPressedHandlers) {
-                handler.handle(event);
-            }
-        });
-
-        scene.setOnKeyReleased(event -> {
-            for (EventHandler<KeyEvent> handler : keyReleasedHandlers) {
                 handler.handle(event);
             }
         });

@@ -11,6 +11,8 @@ public class GamePane extends BorderPane {
 
     public GamePane() {
         canvas = new Canvas(800, 600);
+        canvas.widthProperty().bind(widthProperty());
+        canvas.heightProperty().bind(heightProperty());
 
         setCenter(canvas);
     }
