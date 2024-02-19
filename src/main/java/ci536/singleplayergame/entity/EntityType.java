@@ -5,7 +5,7 @@ import ci536.singleplayergame.math.Vector2f;
 // TODO: This could also be used for things such as spawn rules
 //  or anything else that should be specific to an entity type instead of an entity
 public class EntityType<T extends Entity> {
-    public static final EntityType<Player> PLAYER = new EntityType<>(type -> new Player(), "player", new Vector2f(100, 100));
+    public static final EntityType<Player> PLAYER = new EntityType<>(type -> null, "player", new Vector2f(100, 100));
 
     private final EntityFactory<T> factory;
     private final String name;

@@ -72,6 +72,10 @@ public sealed class AABB permits AABB.Mutable {
         return height.get();
     }
 
+    public Vector2f getCenter() {
+        return new Vector2f((float) (getX() + getWidth() / 2), (float) (getY() + getHeight() / 2));
+    }
+
     public static final class Mutable extends AABB {
         public Mutable(double x, double y, double width, double height) {
             super(x, y, width, height);

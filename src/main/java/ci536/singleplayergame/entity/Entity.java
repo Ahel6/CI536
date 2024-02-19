@@ -53,8 +53,12 @@ public abstract class Entity extends GameObject implements Updatable {
         return this.type.getSize();
     }
 
+    public float getHealth() {
+        return getAttributeValue(EntityAttribute.HEALTH, Float.class);
+    }
+
     public boolean isDead() {
-        return getAttributeValue(EntityAttribute.HEALTH, Float.class) <= 0f;
+        return getHealth() <= 0f;
     }
 
     public EntityAttribute.AttributeValue<?> getAttribute(EntityAttribute<?> attribute) {

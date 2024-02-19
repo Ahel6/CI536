@@ -3,6 +3,7 @@ package ci536.singleplayergame.ui;
 import ci536.singleplayergame.Input;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.input.KeyCode;
 
@@ -10,22 +11,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Gui {
-    private final IntegerProperty screenWidth = new SimpleIntegerProperty(800);
-    private final IntegerProperty screenHeight = new SimpleIntegerProperty(600);
+    protected final IntegerProperty screenWidth = new SimpleIntegerProperty(800);
+    protected final IntegerProperty screenHeight = new SimpleIntegerProperty(600);
 
     private final List<GuiWidget> widgets = new ArrayList<>();
     private final InputListener inputListener;
 
     protected int leftPos, topPos;
 
-    public Gui(IntegerProperty screenWidth, IntegerProperty screenHeight) {
-        this.screenWidth.bind(screenWidth);
-        this.screenHeight.bind(screenHeight);
-
+    public Gui() {
         this.inputListener = Input.INSTANCE.addListener(this);
     }
 
-    public void init() {
+    public void init(ObservableValue<Integer> screenWidth, ObservableValue<Integer> screenHeight) {
+        this.screenWidth.bind(screenWidth);
+        this.screenHeight.bind(screenHeight);
+
         this.leftPos = (this.screenWidth.get() - getWidth()) / 2;
         this.topPos = (this.screenHeight.get() - getHeight()) / 2;
     }

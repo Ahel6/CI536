@@ -13,18 +13,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Input {
     public static final Input INSTANCE = new Input();
 
     private final Map<String, Boolean> currentlyActiveKeys = new HashMap<>();
 
-    private final List<EventHandler<MouseEvent>> mouseMovedHandlers = new ArrayList<>();
-    private final List<EventHandler<MouseEvent>> mouseClickedHandlers = new ArrayList<>();
-    private final List<EventHandler<MouseEvent>> mouseDraggedHandlers = new ArrayList<>();
-    private final List<EventHandler<MouseEvent>> mouseReleasedHandlers = new ArrayList<>();
-    private final List<EventHandler<KeyEvent>> keyPressedHandlers = new ArrayList<>();
-    private final List<EventHandler<KeyEvent>> keyReleasedHandlers = new ArrayList<>();
+    private final List<EventHandler<MouseEvent>> mouseMovedHandlers = new CopyOnWriteArrayList<>();
+    private final List<EventHandler<MouseEvent>> mouseClickedHandlers = new CopyOnWriteArrayList<>();
+    private final List<EventHandler<MouseEvent>> mouseDraggedHandlers = new CopyOnWriteArrayList<>();
+    private final List<EventHandler<MouseEvent>> mouseReleasedHandlers = new CopyOnWriteArrayList<>();
+    private final List<EventHandler<KeyEvent>> keyPressedHandlers = new CopyOnWriteArrayList<>();
+    private final List<EventHandler<KeyEvent>> keyReleasedHandlers = new CopyOnWriteArrayList<>();
 
     private int mouseX, mouseY;
 
@@ -132,9 +133,11 @@ public class Input {
         if (isKeyPressed("A") || isKeyPressed("LEFT")) {
             horizontalInput -= 1;
         }
+
         if (isKeyPressed("D") || isKeyPressed("RIGHT")) {
             horizontalInput += 1;
         }
+
         return horizontalInput;
     }
 
@@ -143,9 +146,11 @@ public class Input {
         if (isKeyPressed("W") || isKeyPressed("UP")) {
             verticalInput -= 1;
         }
+
         if (isKeyPressed("S") || isKeyPressed("DOWN")) {
             verticalInput += 1;
         }
+
         return verticalInput;
     }
 
