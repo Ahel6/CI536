@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using UnityEngine;
+using Random = System.Random;
 
 public class MazeGrid
 {
@@ -40,19 +41,15 @@ public class MazeGrid
 
 		var cellStack = new Stack<MazeCell>();
 		var backtracking = false;
-
-		var (randomNeighbour, randDir) = GetRandomUnvistedNeighbour(startingCell);
-		randomNeighbour.vistedByGenerator = true;
-
-		var visitedCount = 2;
-
-		cellStack.Push(randomNeighbour);
+		var visitedCount = 1;
 
 		while (true)
 		{
 			if (!backtracking)
 			{
-				var (randNeigbour, dir) = GetRandomUnvistedNeighbour(cellStack.Peek());
+				var current = cellStack.Count > 0 ? cellStack.Peek() : startingCell;
+
+				var (randNeigbour, dir) = GetRandomUnvistedNeighbour(current);
 
 				if (randNeigbour == null)
 				{
@@ -67,16 +64,20 @@ public class MazeGrid
 				switch (dir)
 				{
 					case CellDirection.NORTH:
-						cellStack.Peek().North = randNeigbour;
+						current.North = randNeigbour;
+						randNeigbour.South = current;
 						break;
 					case CellDirection.EAST:
-						cellStack.Peek().East = randNeigbour;
+						current.East = randNeigbour;
+						randNeigbour.West = current;
 						break;
 					case CellDirection.SOUTH:
-						cellStack.Peek().South = randNeigbour;
+						current.South = randNeigbour;
+						randNeigbour.North = current;
 						break;
 					case CellDirection.WEST:
-						cellStack.Peek().West = randNeigbour;
+						current.West = randNeigbour;
+						randNeigbour.East = current;
 						break;
 				}
 
@@ -129,6 +130,14 @@ public class MazeGrid
 			var cell = GetCellInDirection(current, direction);
 			if (cell == null || cell.vistedByGenerator)
 			{
+				if (cell != null)
+				{
+					if (new Random().Next(6) == 1)
+					{
+						return;
+					}
+				}
+
 				availableDirections &= ~direction;
 			}
 		}

@@ -11,9 +11,39 @@ namespace Assets.Scripts
 	{
 		public MazeGrid Grid;
 
+		public GameObject CellPrefab;
+
 		private void Start()
 		{
-			Grid = new MazeGrid(20, 20);
+			Grid = new MazeGrid(10, 10);
+
+			foreach (var item in Grid.GetGrid())
+			{
+				var newPrefab = Instantiate(CellPrefab);
+				newPrefab.transform.position = new Vector3(item.X, 0, item.Y);
+
+				var wallController = newPrefab.GetComponent<CellWallContainer>();
+
+				if (item.North != null)
+				{
+					wallController.NorthWall.SetActive(false);
+				}
+
+				if (item.East != null)
+				{
+					wallController.EastWall.SetActive(false);
+				}
+
+				if (item.South != null)
+				{
+					wallController.SouthWall.SetActive(false);
+				}
+
+				if (item.West != null)
+				{
+					wallController.WestWall.SetActive(false);
+				}
+			}
 		}
 
 		private void OnDrawGizmos()

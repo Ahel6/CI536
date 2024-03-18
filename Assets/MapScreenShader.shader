@@ -3,6 +3,7 @@ Shader "Unlit/MapScreenShader"
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
+        _QuantizeAmount ("Float with range", Range(0, 30)) = 10
     }
     SubShader
     {
@@ -32,6 +33,8 @@ Shader "Unlit/MapScreenShader"
             sampler2D _MainTex;
             float4 _MainTex_ST;
 
+            int _QuantizeAmount;
+
             v2f vert (appdata v)
             {
                 v2f o;
@@ -46,8 +49,8 @@ Shader "Unlit/MapScreenShader"
 
                 float lum = (0.2 * col.r + 0.7 * col.g + 0.1 * col.b);
 
-                lum = (int)(lum * 16);
-                lum /= 16;
+                lum = (int)(lum * _QuantizeAmount);
+                lum /= _QuantizeAmount;
 
                 return lum.xxxx;
             }
