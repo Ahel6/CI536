@@ -33,8 +33,10 @@ public class MazeGrid
 		}
 
 		// Pick random starting point
-		var startingCellX = UnityEngine.Random.Range(0, width - 1);
-		var startingCellY = UnityEngine.Random.Range(0, height - 1);
+		//var startingCellX = UnityEngine.Random.Range(0, width - 1);
+		//var startingCellY = UnityEngine.Random.Range(0, height - 1);
+		var startingCellX = 0;
+		var startingCellY = 0;
 
 		var startingCell = _grid[startingCellX, startingCellY];
 		startingCell.vistedByGenerator = true;
@@ -53,33 +55,24 @@ public class MazeGrid
 
 				if (randNeigbour == null)
 				{
-					// reached a dead end, back track to last cell with unvisited neighbour
+					if (new Random().Next(2) == 1)
+					{
+						var (connect, connectDir) = GetRandomUnvistedNeighbour(current, true);
+
+						if (connect != null)
+						{
+							LinkCells(current, connect, connectDir);
+						}
+					}
+
+					// reached a dead end, backtrack to last cell with unvisited neighbour
 					backtracking = true;
 					continue;
 				}
 
 				randNeigbour.vistedByGenerator = true;
 
-				// remove wall
-				switch (dir)
-				{
-					case CellDirection.NORTH:
-						current.North = randNeigbour;
-						randNeigbour.South = current;
-						break;
-					case CellDirection.EAST:
-						current.East = randNeigbour;
-						randNeigbour.West = current;
-						break;
-					case CellDirection.SOUTH:
-						current.South = randNeigbour;
-						randNeigbour.North = current;
-						break;
-					case CellDirection.WEST:
-						current.West = randNeigbour;
-						randNeigbour.East = current;
-						break;
-				}
+				LinkCells(current, randNeigbour, dir);
 
 				cellStack.Push(randNeigbour);
 				visitedCount++;
@@ -103,7 +96,7 @@ public class MazeGrid
 		}
 	}
 
-	private (MazeCell cell, CellDirection directionFromCurrent) GetRandomUnvistedNeighbour(MazeCell current)
+	private (MazeCell cell, CellDirection directionFromCurrent) GetRandomUnvistedNeighbour(MazeCell current, bool includeVisited = false)
 	{
 		var availableDirections = CellDirection.NORTH | CellDirection.EAST | CellDirection.SOUTH | CellDirection.WEST;
 		ProcessDirection(CellDirection.NORTH);
@@ -128,18 +121,22 @@ public class MazeGrid
 		void ProcessDirection(CellDirection direction)
 		{
 			var cell = GetCellInDirection(current, direction);
-			if (cell == null || cell.vistedByGenerator)
-			{
-				if (cell != null)
-				{
-					if (new Random().Next(6) == 1)
-					{
-						return;
-					}
-				}
 
-				availableDirections &= ~direction;
+			if (includeVisited)
+			{
+				if (cell == null)
+				{
+					availableDirections &= ~direction;
+				}
 			}
+			else
+			{
+				if (cell == null || cell.vistedByGenerator)
+				{
+					availableDirections &= ~direction;
+				}
+			}
+			
 		}
 	}
 
@@ -156,5 +153,28 @@ public class MazeGrid
 			CellDirection.WEST => cellX == 0 ? null : _grid[cellX - 1, cellY],
 			_ => null
 		};
+	}
+
+	private void LinkCells(MazeCell cellA, MazeCell cellB, CellDirection dir)
+	{
+		switch (dir)
+		{
+			case CellDirection.NORTH:
+				cellA.North = cellB;
+				cellB.South = cellA;
+				break;
+			case CellDirection.EAST:
+				cellA.East = cellB;
+				cellB.West = cellA;
+				break;
+			case CellDirection.SOUTH:
+				cellA.South = cellB;
+				cellB.North = cellA;
+				break;
+			case CellDirection.WEST:
+				cellA.West = cellB;
+				cellB.East = cellA;
+				break;
+		}
 	}
 }

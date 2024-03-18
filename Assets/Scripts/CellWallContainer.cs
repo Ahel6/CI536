@@ -13,5 +13,7 @@ namespace Assets.Scripts
 		public GameObject EastWall;
 		public GameObject SouthWall;
 		public GameObject WestWall;
+
+		public GameObject Cover;
 	}
 }

@@ -13,14 +13,16 @@ namespace Assets.Scripts
 
 		public GameObject CellPrefab;
 
+		public Vector2Int MazeSize;
+
 		private void Start()
 		{
-			Grid = new MazeGrid(10, 10);
+			Grid = new MazeGrid(MazeSize.x, MazeSize.y);
 
 			foreach (var item in Grid.GetGrid())
 			{
 				var newPrefab = Instantiate(CellPrefab);
-				newPrefab.transform.position = new Vector3(item.X, 0, item.Y);
+				newPrefab.transform.position = new Vector3(item.X * 3, 0, item.Y * 3);
 
 				var wallController = newPrefab.GetComponent<CellWallContainer>();
 
@@ -43,6 +45,11 @@ namespace Assets.Scripts
 				{
 					wallController.WestWall.SetActive(false);
 				}
+
+				if (item.West == null && item.East == null && item.North == null && item.South == null)
+				{
+					wallController.Cover.SetActive(true);
+				}
 			}
 		}
 
@@ -53,26 +60,28 @@ namespace Assets.Scripts
 				return;
 			}
 
+			Gizmos.color = Color.red;
+
 			foreach (var item in Grid.GetGrid())
 			{
 				if (item.North != null)
 				{
-					Gizmos.DrawLine(new Vector3(item.X, 0, item.Y), new Vector3(item.North.X, 0, item.North.Y));
+					Gizmos.DrawLine(new Vector3(item.X * 3, 0, item.Y * 3), new Vector3(item.North.X * 3, 0, item.North.Y * 3));
 				}
 
 				if (item.East != null)
 				{
-					Gizmos.DrawLine(new Vector3(item.X, 0, item.Y), new Vector3(item.East.X, 0, item.East.Y));
+					Gizmos.DrawLine(new Vector3(item.X * 3, 0, item.Y * 3), new Vector3(item.East.X * 3, 0, item.East.Y * 3));
 				}
 
 				if (item.South != null)
 				{
-					Gizmos.DrawLine(new Vector3(item.X, 0, item.Y), new Vector3(item.South.X, 0, item.South.Y));
+					Gizmos.DrawLine(new Vector3(item.X * 3, 0, item.Y * 3), new Vector3(item.South.X * 3, 0, item.South.Y * 3));
 				}
 
 				if (item.West != null)
 				{
-					Gizmos.DrawLine(new Vector3(item.X, 0, item.Y), new Vector3(item.West.X, 0, item.West.Y));
+					Gizmos.DrawLine(new Vector3(item.X * 3, 0, item.Y * 3), new Vector3(item.West.X * 3, 0, item.West.Y * 3));
 				}
 			}
 		}
