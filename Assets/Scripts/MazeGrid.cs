@@ -1,24 +1,25 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
-using Random = System.Random;
+using UnityEngine.InputSystem;
 
 public class MazeGrid
 {
+	public bool IsFinished { get; private set; } = false;
+
 	private MazeCell[,] _grid;
 
-	public MazeGrid(int width, int height)
+	public MazeGrid(int width, int height, float deadEndLinkChance)
 	{
 		_grid = new MazeCell[width, height];
-		GenerateMaze(width, height);
+		GenerateMaze(width, height, deadEndLinkChance);
 	}
 
-	public MazeCell[,] GetGrid() => _grid;
+	public MazeCell[,] GetCellArray() => _grid;
 
-	private void GenerateMaze(int width, int height)
+	private void GenerateMaze(int width, int height, float deadEndLinkChance)
 	{
 		// Generates a maze using a depth-first algorithm.
 		// Top left of the maze is (0,0)
@@ -32,9 +33,6 @@ public class MazeGrid
 			}
 		}
 
-		// Pick random starting point
-		//var startingCellX = UnityEngine.Random.Range(0, width - 1);
-		//var startingCellY = UnityEngine.Random.Range(0, height - 1);
 		var startingCellX = 0;
 		var startingCellY = 0;
 
@@ -55,11 +53,12 @@ public class MazeGrid
 
 				if (randNeigbour == null)
 				{
-					if (new Random().Next(2) == 1)
+					if (UnityEngine.Random.Range(0f, 1f) <= deadEndLinkChance);
 					{
+						// link to random cell to make maze more connected
 						var (connect, connectDir) = GetRandomUnvistedNeighbour(current, true);
 
-						if (connect != null)
+						if (connect != null && connect.X != width - 1 && connect.Y != height - 1)
 						{
 							LinkCells(current, connect, connectDir);
 						}
@@ -79,7 +78,15 @@ public class MazeGrid
 
 				if (visitedCount == width * height)
 				{
+					IsFinished = true;
 					break;
+				}
+
+				if (randNeigbour.X == width - 1 && randNeigbour.Y == height - 1)
+				{
+					// Force corner opposite of start to be a dead end - the exit.
+					cellStack.Pop();
+					backtracking = true;
 				}
 			}
 			else
@@ -124,7 +131,7 @@ public class MazeGrid
 
 			if (includeVisited)
 			{
-				if (cell == null)
+				if (cell == null || cell.LinkedTo(current))
 				{
 					availableDirections &= ~direction;
 				}

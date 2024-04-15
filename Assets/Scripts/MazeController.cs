@@ -13,13 +13,18 @@ namespace Assets.Scripts
 
 		public GameObject CellPrefab;
 
+		[Tooltip("Dimensions of the maze in cells.")]
 		public Vector2Int MazeSize;
+
+		[Tooltip("Chance that a dead end will connect to a random cell.")]
+		[Range(0f, 1f)]
+		public float DeadEndLinkChance;
 
 		private void Start()
 		{
-			Grid = new MazeGrid(MazeSize.x, MazeSize.y);
+			Grid = new MazeGrid(MazeSize.x, MazeSize.y, DeadEndLinkChance);
 
-			foreach (var item in Grid.GetGrid())
+			foreach (var item in Grid.GetCellArray())
 			{
 				var newPrefab = Instantiate(CellPrefab);
 				newPrefab.transform.position = new Vector3(item.X * 3, 0, item.Y * 3);
@@ -53,37 +58,6 @@ namespace Assets.Scripts
 			}
 		}
 
-		private void OnDrawGizmos()
-		{
-			if (Grid == null)
-			{
-				return;
-			}
-
-			Gizmos.color = Color.red;
-
-			foreach (var item in Grid.GetGrid())
-			{
-				if (item.North != null)
-				{
-					Gizmos.DrawLine(new Vector3(item.X * 3, 0, item.Y * 3), new Vector3(item.North.X * 3, 0, item.North.Y * 3));
-				}
-
-				if (item.East != null)
-				{
-					Gizmos.DrawLine(new Vector3(item.X * 3, 0, item.Y * 3), new Vector3(item.East.X * 3, 0, item.East.Y * 3));
-				}
-
-				if (item.South != null)
-				{
-					Gizmos.DrawLine(new Vector3(item.X * 3, 0, item.Y * 3), new Vector3(item.South.X * 3, 0, item.South.Y * 3));
-				}
-
-				if (item.West != null)
-				{
-					Gizmos.DrawLine(new Vector3(item.X * 3, 0, item.Y * 3), new Vector3(item.West.X * 3, 0, item.West.Y * 3));
-				}
-			}
-		}
+		
 	}
 }

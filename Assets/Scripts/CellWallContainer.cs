@@ -15,5 +15,7 @@ namespace Assets.Scripts
 		public GameObject WestWall;
 
 		public GameObject Cover;
+
+		public GameObject FloorHolePlug;
 	}
 }
