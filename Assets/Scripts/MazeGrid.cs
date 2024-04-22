@@ -113,7 +113,7 @@ public class MazeGrid
 
 		var matching = Enum.GetValues(typeof(CellDirection))
 				   .Cast<CellDirection>()
-				   .Where(dir => availableDirections.HasFlag(dir))
+				   .Where(dir => availableDirections.HasFlag(dir) && dir != CellDirection.NONE)
 				   .ToArray();
 
 		if (matching == null || matching.Length == 0)

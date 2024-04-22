@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace Assets.Scripts
 {
@@ -20,9 +21,12 @@ namespace Assets.Scripts
 		[Range(0f, 1f)]
 		public float DeadEndLinkChance;
 
-		private MazeGrid _maze;
+		[Tooltip("The player object.")]
+		public PlayerMover Player;
 
-		public MazeCell CurrentCell { get; private set; }
+		public MazeGrid Maze { get; private set; }
+
+		public MazeCell CurrentCell => Player.CurrentCell;
 
 		private void Awake()
 		{
@@ -31,13 +35,47 @@ namespace Assets.Scripts
 
 		private void Start()
 		{
-			_maze = new MazeGrid(MazeSize.x, MazeSize.y, DeadEndLinkChance);
+			// Generate maze
+			Maze = new MazeGrid(MazeSize.x, MazeSize.y, DeadEndLinkChance);
 			GenerateMazeGeometry();
+
+			// Ensure player is at start
+			Player.MoveToCell(0, 0);
+
+			// Rotate player to face door
+			// Starting room only has one connection, in N or E
+			if (CurrentCell.North != null)
+			{
+				Player.transform.rotation = Quaternion.identity;
+			}
+
+			if (CurrentCell.East != null)
+			{
+				Player.transform.rotation = Quaternion.Euler(0, 90, 0);
+			}
+		}
+
+		public void Update()
+		{
+			if (Keyboard.current[Key.LeftArrow].wasPressedThisFrame)
+			{
+				Player.TurnLeft();
+			}
+
+			if (Keyboard.current[Key.RightArrow].wasPressedThisFrame)
+			{
+				Player.TurnRight();
+			}
+
+			if (Keyboard.current[Key.UpArrow].wasPressedThisFrame)
+			{
+				Player.MoveForward();
+			}
 		}
 
 		private void GenerateMazeGeometry()
 		{
-			foreach (var item in _maze.GetCellArray())
+			foreach (var item in Maze.GetCellArray())
 			{
 				var newPrefab = Instantiate(CellPrefab);
 				newPrefab.transform.position = new Vector3(item.X * 3, 0, item.Y * 3);
@@ -78,14 +116,14 @@ namespace Assets.Scripts
 
 		private void OnDrawGizmos()
 		{
-			if (_maze == null)
+			if (Maze == null)
 			{
 				return;
 			}
 
 			Gizmos.color = Color.red;
 
-			foreach (var item in _maze.GetCellArray())
+			foreach (var item in Maze.GetCellArray())
 			{
 				if (item.North != null)
 				{

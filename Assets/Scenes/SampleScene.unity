@@ -208,8 +208,9 @@ GameObject:
   m_Component:
   - component: {fileID: 510728458}
   - component: {fileID: 510728457}
+  - component: {fileID: 510728459}
   m_Layer: 0
-  m_Name: MapCamera
+  m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -282,6 +283,18 @@ Transform:
   - {fileID: 1027723792}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &510728459
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 510728456}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c306a7eaf8625d4eb690196dbcf6257, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &748750796
 GameObject:
   m_ObjectHideFlags: 0
@@ -329,6 +342,7 @@ MonoBehaviour:
   CellPrefab: {fileID: 4879606271061389520, guid: 26944d21a269750458172c72686bf3b2, type: 3}
   MazeSize: {x: 10, y: 10}
   DeadEndLinkChance: 0.5
+  Player: {fileID: 510728459}
 --- !u!1 &1027723791
 GameObject:
   m_ObjectHideFlags: 0

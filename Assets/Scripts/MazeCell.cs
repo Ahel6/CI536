@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 [Serializable]
 public class MazeCell
@@ -32,6 +33,53 @@ public class MazeCell
 		}
 
 		return false;
+	}
+
+	public MazeCell GetCellInDirection(CellDirection dir)
+	{
+		Debug.Log($"{X},{Y} GetCellInDirection {dir}");
+		if (dir == CellDirection.NORTH)
+		{
+			Debug.Log($"- NORTH - null:{North == null}");
+			return North;
+		}
+		else if (dir == CellDirection.EAST)
+		{
+			Debug.Log($"- EAST - null:{East == null}");
+			return East;
+		}
+		else if (dir == CellDirection.SOUTH)
+		{
+			Debug.Log($"- SOUTH - null:{South == null}");
+			return South;
+		}
+		else if (dir == CellDirection.WEST)
+		{
+			Debug.Log($"- WEST - null:{West == null}");
+			return West;
+		}
+
+		return null;
+	}
+
+	public bool IsDeadEnd()
+	{
+		var sum = 0;
+
+		void SumDir(MazeCell dir)
+		{
+			if (dir != null)
+			{
+				sum += 1;
+			}
+		}
+
+		SumDir(North);
+		SumDir(East);
+		SumDir(South);
+		SumDir(West);
+
+		return sum == 1;
 	}
 
 	// store other info here, like if this is a shop etc
