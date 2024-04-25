@@ -16,6 +16,11 @@ namespace Assets.Scripts
 
 		public GameObject Cover;
 
-		public GameObject FloorHolePlug;
+		public GameObject NorthHolePlug;
+		public GameObject EastHolePlug;
+		public GameObject SouthHolePlug;
+		public GameObject WestHolePlug;
+
+		public GameObject ExitObjects;
 	}
 }

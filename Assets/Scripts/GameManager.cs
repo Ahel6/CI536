@@ -38,15 +38,16 @@ namespace Assets.Scripts
 			// Generate maze
 			Maze = new MazeGrid(MazeSize.x, MazeSize.y, DeadEndLinkChance);
 			GenerateMazeGeometry();
+			GenerateEndCell();
 
 			// Ensure player is at start
 			Player.MoveToCell(0, 0);
 
 			// Rotate player to face door
-			// Starting room only has one connection, in N or E
-			if (CurrentCell.North != null)
+			// Starting room only has one connection, in S or E
+			if (CurrentCell.South != null)
 			{
-				Player.transform.rotation = Quaternion.identity;
+				Player.transform.rotation = Quaternion.Euler(0, 180, 0);
 			}
 
 			if (CurrentCell.East != null)
@@ -78,7 +79,7 @@ namespace Assets.Scripts
 			foreach (var item in Maze.GetCellArray())
 			{
 				var newPrefab = Instantiate(CellPrefab);
-				newPrefab.transform.position = new Vector3(item.X * 3, 0, item.Y * 3);
+				newPrefab.transform.position = item.WorldPosition;
 
 				var wallController = newPrefab.GetComponent<CellWallContainer>();
 
@@ -109,9 +110,39 @@ namespace Assets.Scripts
 
 				if (item.X == MazeSize.x - 1 && item.Y == MazeSize.y - 1)
 				{
-					wallController.FloorHolePlug.SetActive(false);
+					//wallController.FloorHolePlug.SetActive(false);
+					wallController.ExitObjects.SetActive(true);
+
+					if (item.North != null)
+					{
+						// North connection
+						wallController.ExitObjects.transform.rotation = Quaternion.Euler(0, 0, 0);
+						wallController.SouthHolePlug.SetActive(false);
+					}
+					else
+					{
+						// West connection
+						wallController.ExitObjects.transform.rotation = Quaternion.Euler(0, 90, 0);
+						wallController.EastHolePlug.SetActive(false);
+					}
 				}
 			}
+		}
+
+		private void GenerateEndCell()
+		{
+			// Starting with starting cell, assign each travelled cell an incrementally higher number
+			// Cell with highest number is the furthest cell away from the start.
+
+			var cellArray = Maze.GetCellArray();
+
+			var startingCell = cellArray[0, 0];
+			startingCell.depthValue = 0;
+
+			/*while (cellArray.Cast<MazeCell>().ToList().Any(x => x.depthValue == -1))
+			{
+
+			}*/
 		}
 
 		private void OnDrawGizmos()
@@ -127,22 +158,22 @@ namespace Assets.Scripts
 			{
 				if (item.North != null)
 				{
-					Gizmos.DrawLine(new Vector3(item.X * 3, 0, item.Y * 3), new Vector3(item.North.X * 3, 0, item.North.Y * 3));
+					Gizmos.DrawLine(item.WorldPosition, item.North.WorldPosition);
 				}
 
 				if (item.East != null)
 				{
-					Gizmos.DrawLine(new Vector3(item.X * 3, 0, item.Y * 3), new Vector3(item.East.X * 3, 0, item.East.Y * 3));
+					Gizmos.DrawLine(item.WorldPosition, item.East.WorldPosition);
 				}
 
 				if (item.South != null)
 				{
-					Gizmos.DrawLine(new Vector3(item.X * 3, 0, item.Y * 3), new Vector3(item.South.X * 3, 0, item.South.Y * 3));
+					Gizmos.DrawLine(item.WorldPosition, item.South.WorldPosition);
 				}
 
 				if (item.West != null)
 				{
-					Gizmos.DrawLine(new Vector3(item.X * 3, 0, item.Y * 3), new Vector3(item.West.X * 3, 0, item.West.Y * 3));
+					Gizmos.DrawLine(item.WorldPosition, item.West.WorldPosition);
 				}
 			}
 		}

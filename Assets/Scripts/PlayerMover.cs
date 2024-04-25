@@ -66,13 +66,13 @@ namespace Assets.Scripts
 
 		public void MoveToCell(int x, int y)
 		{
-			transform.position = new Vector3(x * 3, 0, y * 3);
+			transform.position = new Vector3(x * 3, 0, y * -3);
 			CurrentCell = GameManager.Instance.Maze.GetCellArray()[x, y];
 		}
 
 		public void MoveToCell(MazeCell cell)
 		{
-			transform.position = new Vector3(cell.X * 3, 0, cell.Y * 3);
+			transform.position = cell.WorldPosition;
 			CurrentCell = GameManager.Instance.Maze.GetCellArray()[cell.X, cell.Y];
 		}
 	}
