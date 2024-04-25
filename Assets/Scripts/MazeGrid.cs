@@ -53,7 +53,7 @@ public class MazeGrid
 
 				if (randNeigbour == null)
 				{
-					if (UnityEngine.Random.Range(0f, 1f) <= deadEndLinkChance);
+					if (UnityEngine.Random.Range(0f, 1f) <= deadEndLinkChance)
 					{
 						// link to random cell to make maze more connected
 						var (connect, connectDir) = GetRandomUnvistedNeighbour(current, true);
