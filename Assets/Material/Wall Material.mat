@@ -8,14 +8,14 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Wall Material
-  m_Shader: {fileID: 45, guid: 0000000000000000f000000000000000, type: 0}
+  m_Shader: {fileID: 4800000, guid: 6c2974a511f421f4aa9dc2a2e1c3b931, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
   - _NORMALMAP
-  - _SPECGLOSSMAP
   m_InvalidKeywords:
   - _METALLICGLOSSMAP
+  - _SPECGLOSSMAP
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -75,6 +75,7 @@ Material:
     - _GlossMapScale: 0.2
     - _Glossiness: 0.5
     - _GlossyReflections: 1
+    - _MapScale: 1
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1
