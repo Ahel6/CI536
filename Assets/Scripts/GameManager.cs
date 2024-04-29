@@ -29,6 +29,8 @@ namespace Assets.Scripts
 
 		public MazeCell CurrentCell => Player.CurrentCell;
 
+		public MazeCell EndingCell;
+
 		private void Awake()
 		{
 			Instance = this;
@@ -40,6 +42,7 @@ namespace Assets.Scripts
 			Maze = new MazeGrid(MazeSize.x, MazeSize.y, DeadEndLinkChance);
 			GenerateMazeGeometry();
 			GenerateEndCell();
+			GenerateShop();
 
 			// Ensure player is at start
 			Player.MoveToCell(0, 0);
@@ -145,36 +148,54 @@ namespace Assets.Scripts
 				currentCells.AddRange(nextCells);
 			}
 
-			var endingCell = cellArray.Cast<MazeCell>().ToList().MaxBy(x => x.depthValue);
+			EndingCell = cellArray.Cast<MazeCell>().ToList().MaxBy(x => x.depthValue);
+			Debug.Log($"Generating exit at {EndingCell.X},{EndingCell.Y}");
 
-			var wallController = endingCell.prefab;
+			var wallController = EndingCell.prefab;
 
 			wallController.ExitObjects.SetActive(true);
 
-			if (endingCell.North != null)
+			if (EndingCell.North != null)
 			{
 				// North connection
 				wallController.ExitObjects.transform.rotation = Quaternion.Euler(0, 0, 0);
 				wallController.SouthHolePlug.SetActive(false);
 			}
-			else if (endingCell.West != null)
+			else if (EndingCell.West != null)
 			{
 				// West connection
 				wallController.ExitObjects.transform.rotation = Quaternion.Euler(0, 90, 0);
 				wallController.EastHolePlug.SetActive(false);
 			}
-			else if (endingCell.East != null)
+			else if (EndingCell.East != null)
 			{
 				// East connection
 				wallController.ExitObjects.transform.rotation = Quaternion.Euler(0, 270, 0);
 				wallController.WestHolePlug.SetActive(false);
 			}
-			else if (endingCell.South != null)
+			else if (EndingCell.South != null)
 			{
 				// South connection
 				wallController.ExitObjects.transform.rotation = Quaternion.Euler(0, 180, 0);
 				wallController.NorthHolePlug.SetActive(false);
 			}
+		}
+
+		private void GenerateShop()
+		{
+			// Generate shop halfway through maze
+
+			var startingDepth = 0;
+			var endingDepth = EndingCell.depthValue;
+			var midpoint = (endingDepth - startingDepth) / 2;
+
+			var possibleShopLocations = Maze.GetCellArray().Cast<MazeCell>().ToList().Where(x => x.depthValue == midpoint).ToList();
+
+			var shopCell = possibleShopLocations[UnityEngine.Random.Range(0, possibleShopLocations.Count)];
+
+			Debug.Log($"Generating shop at {shopCell.X},{shopCell.Y}");
+
+			// todo - implement
 		}
 
 		private void OnDrawGizmos()
