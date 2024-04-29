@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -44,15 +45,70 @@ namespace Assets.Scripts
 			}
 		}
 
+		private bool _isTurning;
+		private bool _isMoving;
 
 		public void TurnLeft()
 		{
-			transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y - 45, 0);
+			if (_isTurning)
+			{
+				return;
+			}
+
+			StartCoroutine(TurnCoroutine(-90));
 		}
 
 		public void TurnRight()
 		{
-			transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y + 45, 0);
+			if (_isTurning)
+			{
+				return;
+			}
+
+			StartCoroutine(TurnCoroutine(90));
+		}
+
+		private IEnumerator MoveCoroutine(Vector3 targetPosition)
+		{
+			_isMoving = true;
+			while (true)
+			{
+				var newPos = Vector3.MoveTowards(transform.position, targetPosition, Time.deltaTime * 10);
+
+				if (Mathf.Approximately(targetPosition.x, newPos.x)
+					&& Mathf.Approximately(targetPosition.y, newPos.y)
+					&& Mathf.Approximately(targetPosition.z, newPos.z))
+				{
+					newPos = targetPosition;
+					transform.position = newPos;
+					_isMoving = false;
+					break;
+				}
+
+				transform.position = newPos;
+				yield return null;
+			}
+		}
+
+		private IEnumerator TurnCoroutine(float turnBy)
+		{
+			_isTurning = true;
+			var target = transform.rotation.eulerAngles.y + turnBy;
+			while (true)
+			{
+				var newRotation = Mathf.MoveTowardsAngle(transform.localEulerAngles.y, target, Time.deltaTime * 240);
+				if (Mathf.Approximately(target, newRotation))
+				{
+					newRotation = target;
+					transform.localEulerAngles = new Vector3(0, newRotation, 0);
+					_isTurning = false;
+					break;
+				}
+
+				transform.localEulerAngles = new Vector3(0, newRotation, 0);
+
+				yield return null;
+			}
 		}
 
 		public void MoveForward()
@@ -86,15 +142,41 @@ namespace Assets.Scripts
 			// fade screen back in
 		}
 
-		public void MoveToCell(int x, int y)
+		public void MoveToCell(int x, int y, bool instantly = false)
 		{
-			transform.position = new Vector3(x * 3, 0, y * -3);
+			if (_isMoving)
+			{
+				return;
+			}	
+
+			if (instantly)
+			{
+				transform.position = new Vector3(x * 3, 0, y * -3);
+			}
+			else
+			{
+				StartCoroutine(MoveCoroutine(new Vector3(x * 3, 0, y * -3)));
+			}
+
 			CurrentCell = GameManager.Instance.Maze.GetCellArray()[x, y];
 		}
 
-		public void MoveToCell(MazeCell cell)
+		public void MoveToCell(MazeCell cell, bool instantly = false)
 		{
-			transform.position = cell.WorldPosition;
+			if (_isMoving)
+			{
+				return;
+			}
+
+			if (instantly)
+			{
+				transform.position = cell.WorldPosition;
+			}
+			else
+			{
+				StartCoroutine(MoveCoroutine(cell.WorldPosition));
+			}
+			
 			CurrentCell = GameManager.Instance.Maze.GetCellArray()[cell.X, cell.Y];
 		}
 	}

@@ -54,7 +54,7 @@ namespace Assets.Scripts
 			GenerateShop();
 
 			// Ensure player is at start
-			Player.MoveToCell(0, 0);
+			Player.MoveToCell(0, 0, true);
 
 			// Rotate player to face door
 			// Starting room only has one connection, in S or E
