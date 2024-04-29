@@ -47,13 +47,6 @@ Shader "Unlit/MapScreenShader"
             {
                 fixed4 col = tex2D(_MainTex, i.uv);
 
-                //float lum = (0.2 * col.r + 0.7 * col.g + 0.1 * col.b);
-
-                //lum = (int)(lum * _QuantizeAmount);
-                //lum /= _QuantizeAmount;
-
-                //return lum.xxxx;
-
                 col = floor(col * _QuantizeAmount);
                 col /= _QuantizeAmount;
 
