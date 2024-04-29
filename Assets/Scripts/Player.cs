@@ -68,6 +68,24 @@ namespace Assets.Scripts
 			MoveToCell(cellToMoveTo);
 		}
 
+		public void ExitLayer()
+		{
+			if (GameManager.Instance.EndingCell != CurrentCell)
+			{
+				Debug.LogError($"Can't ExitLayer() when not in exit!");
+				return;
+			}
+
+			// fade out screen
+
+			// reset maze
+			var currentWidth = GameManager.Instance.Maze.GetCellArray().GetLength(0);
+			var currentHeight = GameManager.Instance.Maze.GetCellArray().GetLength(0);
+			GameManager.Instance.StartNewLayer(currentWidth + 1, currentHeight + 1);
+
+			// fade screen back in
+		}
+
 		public void MoveToCell(int x, int y)
 		{
 			transform.position = new Vector3(x * 3, 0, y * -3);

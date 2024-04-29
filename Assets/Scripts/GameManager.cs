@@ -31,6 +31,8 @@ namespace Assets.Scripts
 
 		public MazeCell EndingCell;
 
+		private GameObject mazeParent;
+
 		private void Awake()
 		{
 			Instance = this;
@@ -38,8 +40,15 @@ namespace Assets.Scripts
 
 		private void Start()
 		{
+			StartNewLayer(MazeSize.x, MazeSize.y);
+		}
+
+		public void StartNewLayer(int width, int height)
+		{
+			Debug.Log($"Start new layer width:{width} height:{height}");
+
 			// Generate maze
-			Maze = new MazeGrid(MazeSize.x, MazeSize.y, DeadEndLinkChance);
+			Maze = new MazeGrid(width, height, DeadEndLinkChance);
 			GenerateMazeGeometry();
 			GenerateEndCell();
 			GenerateShop();
@@ -76,13 +85,25 @@ namespace Assets.Scripts
 			{
 				Player.MoveForward();
 			}
+
+			if (Keyboard.current[Key.Enter].wasPressedThisFrame)
+			{
+				Player.ExitLayer();
+			}
 		}
 
 		private void GenerateMazeGeometry()
 		{
+			if (mazeParent != null)
+			{
+				Destroy(mazeParent);
+			}
+
+			mazeParent = new GameObject("MazeParent");
+
 			foreach (var item in Maze.GetCellArray())
 			{
-				var newPrefab = Instantiate(CellPrefab);
+				var newPrefab = Instantiate(CellPrefab, mazeParent.transform);
 				newPrefab.transform.position = item.WorldPosition;
 
 				var wallController = newPrefab.GetComponent<CellWallContainer>();
