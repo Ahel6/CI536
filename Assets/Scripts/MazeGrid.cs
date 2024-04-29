@@ -54,8 +54,12 @@ public class MazeGrid
 
 				if (randNeigbour == null)
 				{
+					Debug.Log($"Reached a dead end.");
+
 					if (UnityEngine.Random.Range(0f, 1f) <= deadEndLinkChance)
 					{
+						Debug.Log($"Trying to link to another cell...");
+
 						// link to random cell to make maze more connected
 						var (connect, connectDir) = GetRandomUnvistedNeighbour(current, true);
 
@@ -82,22 +86,18 @@ public class MazeGrid
 					IsFinished = true;
 					break;
 				}
-
-				if (randNeigbour.X == width - 1 && randNeigbour.Y == height - 1)
-				{
-					// Force corner opposite of start to be a dead end - the exit.
-					cellStack.Pop();
-					backtracking = true;
-				}
 			}
 			else
 			{
+				Debug.Log($"Attempting backtrack...");
+
 				if (GetRandomUnvistedNeighbour(cellStack.Peek()).cell == null)
 				{
 					cellStack.Pop();
 				}
 				else
 				{
+					Debug.Log($"Finished backtrack.");
 					backtracking = false;
 				}
 			}
@@ -165,6 +165,7 @@ public class MazeGrid
 
 	private void LinkCells(MazeCell cellA, MazeCell cellB, CellDirection dir)
 	{
+		Debug.Log($"Linking {cellA} {dir} to {cellB}");
 		switch (dir)
 		{
 			case CellDirection.NORTH:

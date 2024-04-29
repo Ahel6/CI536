@@ -212,6 +212,11 @@ namespace Assets.Scripts
 
 			var possibleShopLocations = Maze.GetCellArray().Cast<MazeCell>().ToList().Where(x => x.depthValue == midpoint && !x.IsStart && !x.IsExit).ToList();
 
+			if (possibleShopLocations.Count == 0)
+			{
+				return;
+			}
+
 			var shopCell = possibleShopLocations[UnityEngine.Random.Range(0, possibleShopLocations.Count)];
 			shopCell.IsShop = true;
 			Debug.Log($"Generating shop at {shopCell.X},{shopCell.Y}");
@@ -226,15 +231,15 @@ namespace Assets.Scripts
 
 			for (var i = 0; i < numberOfEnemies; i++)
 			{
-				var cell = possibleCells[UnityEngine.Random.Range(0, possibleCells.Count)];
-				Debug.Log($"Generating enemy at {cell.X},{cell.Y}");
-				cell.IsEnemy = true;
-				possibleCells.Remove(cell);
-
 				if (possibleCells.Count == 0)
 				{
 					break;
 				}
+
+				var cell = possibleCells[UnityEngine.Random.Range(0, possibleCells.Count)];
+				Debug.Log($"Generating enemy at {cell.X},{cell.Y}");
+				cell.IsEnemy = true;
+				possibleCells.Remove(cell);
 			}
 		}
 

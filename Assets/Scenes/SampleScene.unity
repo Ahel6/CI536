@@ -344,8 +344,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   CellPrefab: {fileID: 4879606271061389520, guid: 26944d21a269750458172c72686bf3b2, type: 3}
-  MazeSize: {x: 3, y: 3}
-  DeadEndLinkChance: 0.5
+  MazeSize: {x: 2, y: 2}
+  DeadEndLinkChance: 0.249
   Player: {fileID: 510728459}
   EndingCell:
     X: 0
@@ -353,6 +353,10 @@ MonoBehaviour:
     vistedByGenerator: 0
     depthValue: 0
     prefab: {fileID: 0}
+    IsStart: 0
+    IsExit: 0
+    IsShop: 0
+    IsEnemy: 0
 --- !u!1 &1027723791
 GameObject:
   m_ObjectHideFlags: 0
