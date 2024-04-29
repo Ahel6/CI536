@@ -344,7 +344,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   CellPrefab: {fileID: 4879606271061389520, guid: 26944d21a269750458172c72686bf3b2, type: 3}
-  MazeSize: {x: 50, y: 50}
+  MazeSize: {x: 5, y: 5}
   DeadEndLinkChance: 0.5
   Player: {fileID: 510728459}
 --- !u!1 &1027723791

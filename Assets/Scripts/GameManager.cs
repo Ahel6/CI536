@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using static UnityEditor.Progress;
 
 namespace Assets.Scripts
 {
@@ -83,6 +84,8 @@ namespace Assets.Scripts
 
 				var wallController = newPrefab.GetComponent<CellWallContainer>();
 
+				item.prefab = wallController;
+
 				if (item.North != null)
 				{
 					wallController.NorthWall.SetActive(false);
@@ -107,25 +110,6 @@ namespace Assets.Scripts
 				{
 					wallController.Cover.SetActive(true);
 				}
-
-				if (item.X == MazeSize.x - 1 && item.Y == MazeSize.y - 1)
-				{
-					//wallController.FloorHolePlug.SetActive(false);
-					wallController.ExitObjects.SetActive(true);
-
-					if (item.North != null)
-					{
-						// North connection
-						wallController.ExitObjects.transform.rotation = Quaternion.Euler(0, 0, 0);
-						wallController.SouthHolePlug.SetActive(false);
-					}
-					else
-					{
-						// West connection
-						wallController.ExitObjects.transform.rotation = Quaternion.Euler(0, 90, 0);
-						wallController.EastHolePlug.SetActive(false);
-					}
-				}
 			}
 		}
 
@@ -139,10 +123,58 @@ namespace Assets.Scripts
 			var startingCell = cellArray[0, 0];
 			startingCell.depthValue = 0;
 
-			/*while (cellArray.Cast<MazeCell>().ToList().Any(x => x.depthValue == -1))
-			{
+			var currentCells = new List<MazeCell> { startingCell };
+			var nextCells = new List<MazeCell>();
 
-			}*/
+			while (cellArray.Cast<MazeCell>().ToList().Any(x => x.depthValue == -1))
+			{
+				foreach (var item in currentCells)
+				{
+					var connectingCells = item.GetConnectingCells();
+					foreach (var connect in connectingCells)
+					{
+						if (connect.depthValue == -1)
+						{
+							connect.depthValue = item.depthValue + 1;
+							nextCells.Add(connect);
+						}
+					}
+				}
+
+				currentCells.Clear();
+				currentCells.AddRange(nextCells);
+			}
+
+			var endingCell = cellArray.Cast<MazeCell>().ToList().MaxBy(x => x.depthValue);
+
+			var wallController = endingCell.prefab;
+
+			wallController.ExitObjects.SetActive(true);
+
+			if (endingCell.North != null)
+			{
+				// North connection
+				wallController.ExitObjects.transform.rotation = Quaternion.Euler(0, 0, 0);
+				wallController.SouthHolePlug.SetActive(false);
+			}
+			else if (endingCell.West != null)
+			{
+				// West connection
+				wallController.ExitObjects.transform.rotation = Quaternion.Euler(0, 90, 0);
+				wallController.EastHolePlug.SetActive(false);
+			}
+			else if (endingCell.East != null)
+			{
+				// East connection
+				wallController.ExitObjects.transform.rotation = Quaternion.Euler(0, 270, 0);
+				wallController.WestHolePlug.SetActive(false);
+			}
+			else if (endingCell.South != null)
+			{
+				// South connection
+				wallController.ExitObjects.transform.rotation = Quaternion.Euler(0, 180, 0);
+				wallController.NorthHolePlug.SetActive(false);
+			}
 		}
 
 		private void OnDrawGizmos()

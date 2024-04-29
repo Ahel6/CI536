@@ -1,3 +1,4 @@
+using Assets.Scripts;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -21,6 +22,8 @@ public class MazeCell
 
 	public bool vistedByGenerator;
 	public int depthValue = -1;
+
+	public CellWallContainer prefab;
 
 	public Vector3 WorldPosition => new(X * 3, 0, Y * -3);
 
