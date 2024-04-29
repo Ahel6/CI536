@@ -38,6 +38,7 @@ public class MazeGrid
 
 		var startingCell = _grid[startingCellX, startingCellY];
 		startingCell.vistedByGenerator = true;
+		startingCell.IsStart = true;
 
 		var cellStack = new Stack<MazeCell>();
 		var backtracking = false;

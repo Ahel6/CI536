@@ -45,13 +45,12 @@ namespace Assets.Scripts
 
 		public void StartNewLayer(int width, int height)
 		{
-			Debug.Log($"Start new layer width:{width} height:{height}");
-
 			// Generate maze
 			Maze = new MazeGrid(width, height, DeadEndLinkChance);
 			GenerateMazeGeometry();
 			GenerateEndCell();
 			GenerateShop();
+			GenerateEnemies();
 
 			// Ensure player is at start
 			Player.MoveToCell(0, 0, true);
@@ -170,6 +169,7 @@ namespace Assets.Scripts
 			}
 
 			EndingCell = cellArray.Cast<MazeCell>().ToList().MaxBy(x => x.depthValue);
+			EndingCell.IsExit = true;
 			Debug.Log($"Generating exit at {EndingCell.X},{EndingCell.Y}");
 
 			var wallController = EndingCell.prefab;
@@ -210,13 +210,32 @@ namespace Assets.Scripts
 			var endingDepth = EndingCell.depthValue;
 			var midpoint = (endingDepth - startingDepth) / 2;
 
-			var possibleShopLocations = Maze.GetCellArray().Cast<MazeCell>().ToList().Where(x => x.depthValue == midpoint).ToList();
+			var possibleShopLocations = Maze.GetCellArray().Cast<MazeCell>().ToList().Where(x => x.depthValue == midpoint && !x.IsStart && !x.IsExit).ToList();
 
 			var shopCell = possibleShopLocations[UnityEngine.Random.Range(0, possibleShopLocations.Count)];
-
+			shopCell.IsShop = true;
 			Debug.Log($"Generating shop at {shopCell.X},{shopCell.Y}");
 
 			// todo - implement
+		}
+
+		private void GenerateEnemies()
+		{
+			var numberOfEnemies = Maze.GetCellArray().GetLength(0) - 2;
+			var possibleCells = Maze.GetCellArray().Cast<MazeCell>().ToList().Where(x => !x.IsExit && !x.IsShop && !x.IsStart).ToList();
+
+			for (var i = 0; i < numberOfEnemies; i++)
+			{
+				var cell = possibleCells[UnityEngine.Random.Range(0, possibleCells.Count)];
+				Debug.Log($"Generating enemy at {cell.X},{cell.Y}");
+				cell.IsEnemy = true;
+				possibleCells.Remove(cell);
+
+				if (possibleCells.Count == 0)
+				{
+					break;
+				}
+			}
 		}
 
 		private void OnDrawGizmos()
@@ -226,10 +245,35 @@ namespace Assets.Scripts
 				return;
 			}
 
-			Gizmos.color = Color.red;
+			Gizmos.color = Color.white;
 
 			foreach (var item in Maze.GetCellArray())
 			{
+				if (item.IsStart)
+				{
+					Gizmos.color = Color.green;
+					Gizmos.DrawWireSphere(item.WorldPosition, 1);
+					Gizmos.color = Color.white;
+				}
+				else if (item.IsExit)
+				{
+					Gizmos.color = Color.blue;
+					Gizmos.DrawWireSphere(item.WorldPosition, 1);
+					Gizmos.color = Color.white;
+				}
+				else if (item.IsEnemy)
+				{
+					Gizmos.color = Color.red;
+					Gizmos.DrawWireSphere(item.WorldPosition, 1);
+					Gizmos.color = Color.white;
+				}
+				else if (item.IsShop)
+				{
+					Gizmos.color = Color.cyan;
+					Gizmos.DrawWireSphere(item.WorldPosition, 1);
+					Gizmos.color = Color.white;
+				}
+
 				if (item.North != null)
 				{
 					Gizmos.DrawLine(item.WorldPosition, item.North.WorldPosition);

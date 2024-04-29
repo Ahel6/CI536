@@ -80,4 +80,9 @@ public class MazeCell
 	}
 
 	// store other info here, like if this is a shop etc
+
+	public bool IsStart;
+	public bool IsExit;
+	public bool IsShop;
+	public bool IsEnemy;
 }
