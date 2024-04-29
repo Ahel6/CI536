@@ -3,29 +3,25 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Assets.Scripts
 {
-	public class PlayerMover : MonoBehaviour
+	public class Player : MonoBehaviour
 	{
+		public const double Multiplier = 1.3;
+
+		public int Health;
+		public int EnemyAttack;
+		public int GoldDropped;
+		public int XPDropped;
+
 		public MazeCell CurrentCell { get; private set; }
-
-		public void TurnLeft()
-		{
-			transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y - 45, 0);
-		}
-
-		public void TurnRight()
-		{
-			transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y + 45, 0);
-		}
 
 		public CellDirection GetCurrentDirection()
 		{
-			Debug.Log($"GetCurrentDirection");
 			var modAngle = Mathf.RoundToInt(transform.rotation.eulerAngles.y % 360);
-			Debug.Log($" - modAngle:{modAngle}");
 			if (modAngle == 0)
 			{
 				return CellDirection.NORTH;
@@ -48,13 +44,21 @@ namespace Assets.Scripts
 			}
 		}
 
+
+		public void TurnLeft()
+		{
+			transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y - 45, 0);
+		}
+
+		public void TurnRight()
+		{
+			transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y + 45, 0);
+		}
+
 		public void MoveForward()
 		{
-			Debug.Log($"Move forward");
 			var direction = GetCurrentDirection();
-			Debug.Log($" - dir:{direction}");
 			var cellToMoveTo = CurrentCell.GetCellInDirection(direction);
-			Debug.Log($" - cell:{cellToMoveTo}");
 
 			if (cellToMoveTo == null)
 			{

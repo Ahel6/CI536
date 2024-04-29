@@ -22,7 +22,7 @@ namespace Assets.Scripts
 		public float DeadEndLinkChance;
 
 		[Tooltip("The player object.")]
-		public PlayerMover Player;
+		public Player Player;
 
 		public MazeGrid Maze { get; private set; }
 
