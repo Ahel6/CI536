@@ -4,8 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 namespace Assets.Scripts
 {
@@ -19,6 +21,16 @@ namespace Assets.Scripts
 		public int XPDropped;
 
 		public MazeCell CurrentCell { get; private set; }
+
+		public bool CanMove;
+
+		private Light _light;
+
+		private void Start()
+		{
+			CanMove = true;
+			_light = GetComponentInChildren<Light>();
+		}
 
 		public CellDirection GetCurrentDirection()
 		{
@@ -45,69 +57,123 @@ namespace Assets.Scripts
 			}
 		}
 
-		private bool _isTurning;
-		private bool _isMoving;
+		private bool _movingToCell;
+		private bool _turning;
+		private float _targetRotation;
+		private bool _isFadingOut;
+		private bool _isFadingIn;
+		private bool _descending;
+		private bool _enteringCombat;
+		private bool _inCombat;
 
 		public void TurnLeft()
 		{
-			if (_isTurning)
+			if (_turning || !CanMove)
 			{
 				return;
 			}
 
-			StartCoroutine(TurnCoroutine(-90));
+			_targetRotation = transform.localEulerAngles.y - 90;
+			_turning = true;
 		}
 
 		public void TurnRight()
 		{
-			if (_isTurning)
+			if (_turning || !CanMove)
 			{
 				return;
 			}
 
-			StartCoroutine(TurnCoroutine(90));
+			_targetRotation = transform.localEulerAngles.y + 90;
+			_turning = true;
 		}
 
-		private IEnumerator MoveCoroutine(Vector3 targetPosition)
+		public void FixedUpdate()
 		{
-			_isMoving = true;
-			while (true)
+			if (_movingToCell)
 			{
+				var targetPosition = CurrentCell.WorldPosition;
 				var newPos = Vector3.MoveTowards(transform.position, targetPosition, Time.deltaTime * 10);
+				transform.position = newPos;
 
 				if (Mathf.Approximately(targetPosition.x, newPos.x)
-					&& Mathf.Approximately(targetPosition.y, newPos.y)
-					&& Mathf.Approximately(targetPosition.z, newPos.z))
+				    && Mathf.Approximately(targetPosition.y, newPos.y)
+				    && Mathf.Approximately(targetPosition.z, newPos.z))
 				{
-					newPos = targetPosition;
-					transform.position = newPos;
-					_isMoving = false;
-					break;
-				}
+					transform.position = targetPosition;
+					_movingToCell = false;
 
-				transform.position = newPos;
-				yield return null;
+					if (CurrentCell.IsEnemy)
+					{
+						_enteringCombat = true;
+					}
+				}
 			}
-		}
 
-		private IEnumerator TurnCoroutine(float turnBy)
-		{
-			_isTurning = true;
-			var target = transform.rotation.eulerAngles.y + turnBy;
-			while (true)
+			if (_turning)
 			{
-				var newRotation = Mathf.MoveTowardsAngle(transform.localEulerAngles.y, target, Time.deltaTime * 240);
-				if (Mathf.Approximately(target, newRotation))
-				{
-					newRotation = target;
-					transform.localEulerAngles = new Vector3(0, newRotation, 0);
-					_isTurning = false;
-					break;
-				}
-
+				var newRotation = Mathf.MoveTowardsAngle(transform.localEulerAngles.y, _targetRotation, Time.deltaTime * 240);
 				transform.localEulerAngles = new Vector3(0, newRotation, 0);
 
-				yield return null;
+				if (Mathf.Approximately(_targetRotation, newRotation))
+				{
+					transform.localEulerAngles = new Vector3(0, _targetRotation, 0);
+					_turning = false;
+				}
+			}
+
+			if (_isFadingOut)
+			{
+				_light.intensity = Mathf.MoveTowards(_light.intensity, 0, Time.deltaTime);
+
+				if (Mathf.Approximately(_light.intensity, 0))
+				{
+					_isFadingOut = false;
+					_light.intensity = 0;
+				}
+			}
+
+			if (_isFadingIn)
+			{
+				_light.intensity = Mathf.MoveTowards(_light.intensity, 1, Time.deltaTime);
+
+				if (Mathf.Approximately(_light.intensity, 1))
+				{
+					CanMove = true;
+					_isFadingIn = false;
+					_light.intensity = 1;
+				}
+			}
+
+			if (_descending)
+			{
+				if (_light.intensity == 0)
+				{
+					var currentWidth = GameManager.Instance.Maze.GetCellArray().GetLength(0);
+					var currentHeight = GameManager.Instance.Maze.GetCellArray().GetLength(0);
+					GameManager.Instance.StartNewLayer(currentWidth + 1, currentHeight + 1);
+					_isFadingIn = true;
+					_descending = false;
+				}
+				else if (!_isFadingOut)
+				{
+					CanMove = false;
+					_isFadingOut = true;
+				}
+			}
+
+			if (_enteringCombat)
+			{
+				if (_light.intensity == 0)
+				{
+					_inCombat = true;
+					_enteringCombat = false;
+				}
+				else if (!_isFadingOut)
+				{
+					CanMove = false;
+					_isFadingOut = true;
+				}
 			}
 		}
 
@@ -132,19 +198,12 @@ namespace Assets.Scripts
 				return;
 			}
 
-			// fade out screen
-
-			// reset maze
-			var currentWidth = GameManager.Instance.Maze.GetCellArray().GetLength(0);
-			var currentHeight = GameManager.Instance.Maze.GetCellArray().GetLength(0);
-			GameManager.Instance.StartNewLayer(currentWidth + 1, currentHeight + 1);
-
-			// fade screen back in
+			_descending = true;
 		}
 
 		public void MoveToCell(int x, int y, bool instantly = false)
 		{
-			if (_isMoving)
+			if (_movingToCell || (!CanMove && !instantly))
 			{
 				return;
 			}	
@@ -155,7 +214,7 @@ namespace Assets.Scripts
 			}
 			else
 			{
-				StartCoroutine(MoveCoroutine(new Vector3(x * 3, 0, y * -3)));
+				_movingToCell = true;
 			}
 
 			CurrentCell = GameManager.Instance.Maze.GetCellArray()[x, y];
@@ -163,7 +222,7 @@ namespace Assets.Scripts
 
 		public void MoveToCell(MazeCell cell, bool instantly = false)
 		{
-			if (_isMoving)
+			if (_movingToCell || (!CanMove && !instantly))
 			{
 				return;
 			}
@@ -174,7 +233,7 @@ namespace Assets.Scripts
 			}
 			else
 			{
-				StartCoroutine(MoveCoroutine(cell.WorldPosition));
+				_movingToCell = true;
 			}
 			
 			CurrentCell = GameManager.Instance.Maze.GetCellArray()[cell.X, cell.Y];
