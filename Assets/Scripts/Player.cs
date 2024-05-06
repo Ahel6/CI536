@@ -13,12 +13,13 @@ namespace Assets.Scripts
 {
 	public class Player : MonoBehaviour
 	{
+		public static Player Instance;
+
 		public const double Multiplier = 1.3;
 
-		public int Health;
-		public int EnemyAttack;
-		public int GoldDropped;
-		public int XPDropped;
+		public float MaxHealth = 10;
+		public float Health = 10;
+		public int Gold;
 
 		public MazeCell CurrentCell { get; private set; }
 
@@ -28,6 +29,7 @@ namespace Assets.Scripts
 
 		private void Start()
 		{
+			Instance = this;
 			CanMove = true;
 			_light = GetComponentInChildren<Light>();
 		}
@@ -168,6 +170,10 @@ namespace Assets.Scripts
 				{
 					_inCombat = true;
 					_enteringCombat = false;
+					UIManager.Instance.ChangeUIState(UIState.COMBAT);
+
+					var enemy = EnemyManager.Instance.Enemies[0];
+					CombatUI.Instance.LoadEnemy(enemy);
 				}
 				else if (!_isFadingOut)
 				{
