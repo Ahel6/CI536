@@ -15,6 +15,8 @@ public class CombatSystem : MonoBehaviour
      Unit playerUnit;
      Unit enemyUnit;
 
+     public Text Dialogue;
+
     //Text box with info about combat/actions taken
     public Text combatInfo;
     //Player HUD displaying name, lvl, hp
@@ -51,10 +53,10 @@ public class CombatSystem : MonoBehaviour
         enemyUnit = enemyGO.GetComponent<Unit>();
        
         //Initial comabt info displayed
-        combatInfo.text = "You must defeat the" + enemyUnit.CharacterName + "to contiune....";
+        Dialogue.text = "You must defeat the" + "" + enemyUnit.CharacterName + "" + "to contiune....";
 
         //Set up HUDs for player and enemy
-        playerHUD.SetHUD(playerUnit);
+         playerHUD.SetHUD(playerUnit);
         enemyHUD.SetHUD(enemyUnit);
        
         //Set initial state to players turn
@@ -66,8 +68,9 @@ public class CombatSystem : MonoBehaviour
     //Handle actions during players turn
     void PlayerTurn()                                 
     {
+        
         //Prompt for player 
-        combatInfo.text = "Choose an action:";
+        combatInfo.text = "Make your descion:";
     }
 
     //Handle players attack action
@@ -88,7 +91,8 @@ public class CombatSystem : MonoBehaviour
         {
             //Proceed to enemy's turn
             state = BattleState.ENEMYTURN;
-            EnemyTurn();
+            //EnemyTurn();
+            Invoke("StartEnemyTurn", 2f); 
         }
     }
 
@@ -105,6 +109,10 @@ public class CombatSystem : MonoBehaviour
         EnemyTurn();
     }
 
+    void StartEnemyTurn(){
+        state = BattleState.ENEMYTURN;
+    EnemyTurn();
+    }
     //Handle enemy's turn
     void EnemyTurn()
     {
@@ -169,8 +177,8 @@ public class CombatSystem : MonoBehaviour
 
             //Apply defend action than proceed to enemy's turn
             playerUnit.Defend(); 
-            state = BattleState.ENEMYTURN; 
             combatInfo.text = "You are defending against the enemy's attack!";
+            state = BattleState.ENEMYTURN; 
          EnemyTurn();
             
 
