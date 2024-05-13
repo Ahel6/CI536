@@ -15,6 +15,7 @@ namespace Assets.Scripts
 
 		public GameObject MapView;
 		public GameObject CombatView;
+		public GameObject ShopView;
 
 		private void Awake()
 		{
@@ -38,6 +39,9 @@ namespace Assets.Scripts
 					break;
 				case UIState.COMBAT:
 					CombatView.SetActive(true);
+					break;
+				case UIState.SHOP:
+					ShopView.SetActive(true);
 					break;
 			}
 

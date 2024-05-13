@@ -220,8 +220,6 @@ namespace Assets.Scripts
 			var shopCell = possibleShopLocations[UnityEngine.Random.Range(0, possibleShopLocations.Count)];
 			shopCell.IsShop = true;
 			Debug.Log($"Generating shop at {shopCell.X},{shopCell.Y}");
-
-			// todo - implement
 		}
 
 		private void GenerateEnemies()

@@ -19,7 +19,7 @@ namespace Assets.Scripts
 
 		public float MaxHealth = 10;
 		public float Health = 10;
-		public int Gold;
+		public int Gold = 100;
 
 		public MazeCell CurrentCell { get; private set; }
 
@@ -67,6 +67,7 @@ namespace Assets.Scripts
 		private bool _descending;
 		private bool _enteringCombat;
 		private bool _inCombat;
+		private bool _isInShop;
 
 		public void TurnLeft()
 		{
@@ -108,6 +109,11 @@ namespace Assets.Scripts
 					if (CurrentCell.IsEnemy)
 					{
 						_enteringCombat = true;
+					}
+
+					if (CurrentCell.IsShop)
+					{
+						_isInShop = true;
 					}
 				}
 			}
@@ -174,6 +180,23 @@ namespace Assets.Scripts
 
 					var enemy = EnemyManager.Instance.Enemies[0];
 					CombatUI.Instance.LoadEnemy(enemy);
+				}
+				else if (!_isFadingOut)
+				{
+					CanMove = false;
+					_isFadingOut = true;
+				}
+			}
+			
+			if(_isInShop)
+			{
+				if (_light.intensity == 0)
+				{
+					_isInShop = false;
+					UIManager.Instance.ChangeUIState(UIState.SHOP);
+					
+					var shop = ShopManager.Instance.Shops[0];
+					ShopUI.Instance.LoadShop(shop);
 				}
 				else if (!_isFadingOut)
 				{
