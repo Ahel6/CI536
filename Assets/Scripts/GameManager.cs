@@ -70,21 +70,6 @@ namespace Assets.Scripts
 
 		public void Update()
 		{
-			if (Keyboard.current[Key.LeftArrow].wasPressedThisFrame)
-			{
-				Player.TurnLeft();
-			}
-
-			if (Keyboard.current[Key.RightArrow].wasPressedThisFrame)
-			{
-				Player.TurnRight();
-			}
-
-			if (Keyboard.current[Key.UpArrow].wasPressedThisFrame)
-			{
-				Player.MoveForward();
-			}
-
 			if (Keyboard.current[Key.Enter].wasPressedThisFrame)
 			{
 				Player.ExitLayer();

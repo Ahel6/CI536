@@ -31,7 +31,6 @@ namespace Assets.Scripts
 
 			MapView.SetActive(false);
 			CombatView.SetActive(false);
-			ShopView.SetActive(false);
 
 			switch (newState)
 			{
@@ -41,19 +40,20 @@ namespace Assets.Scripts
 				case UIState.COMBAT:
 					CombatView.SetActive(true);
 					break;
-				case UIState.SHOP:
-					ShopView.SetActive(true);
-					break;
 			}
 
 			CurrentState = newState;
+		}
+
+		public void SetShopWindowActive(bool active)
+		{
+			ShopView.SetActive(active);
 		}
 	}
 
 	public enum UIState
 	{
 		EXPLORE,
-		COMBAT,
-		SHOP
+		COMBAT
 	}
 }

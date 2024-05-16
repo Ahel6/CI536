@@ -116,6 +116,8 @@ namespace Assets.Scripts
 						CurrentCell.IsEnemy = false;
 						_enteringCombat = true;
 					}
+
+					UIManager.Instance.SetShopWindowActive(CurrentCell.IsShop);
 				}
 			}
 
