@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: AdvancedSword
   m_EditorClassIdentifier: 
   Name: Advanced Sword
-  Icon: {fileID: 0}
+  Icon: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
