@@ -48,12 +48,13 @@ public class CombatSystem : MonoBehaviour
         
         GameObject playerGO = Instantiate(playerPrefab);
         playerUnit = playerGO.GetComponent<Unit>();
+        
 
         GameObject enemyGO = Instantiate(enemyPrefab);
         enemyUnit = enemyGO.GetComponent<Unit>();
        
         //Initial comabt info displayed
-        Dialogue.text = "You must defeat the" + "" + enemyUnit.CharacterName + "" + "to contiune....";
+        Dialogue.text = "You must defeat the " +  enemyUnit.CharacterName +  " to contiune....";
 
         //Set up HUDs for player and enemy
          playerHUD.SetHUD(playerUnit);
@@ -61,7 +62,7 @@ public class CombatSystem : MonoBehaviour
        
         //Set initial state to players turn
         state = BattleState.PLAYERTURN;
-        PlayerTurn();
+       Invoke("StartPlayerTurn", 2f);
     }
 
 
@@ -71,6 +72,11 @@ public class CombatSystem : MonoBehaviour
         
         //Prompt for player 
         combatInfo.text = "Make your descion:";
+    }
+
+    void StartPlayerTurn(){
+        state = BattleState.PLAYERTURN;
+        PlayerTurn();
     }
 
     //Handle players attack action
@@ -91,7 +97,6 @@ public class CombatSystem : MonoBehaviour
         {
             //Proceed to enemy's turn
             state = BattleState.ENEMYTURN;
-            //EnemyTurn();
             Invoke("StartEnemyTurn", 2f); 
         }
     }
@@ -106,7 +111,7 @@ public class CombatSystem : MonoBehaviour
         
         //Proceed to enemy's turn
         state = BattleState.ENEMYTURN;
-        EnemyTurn();
+       Invoke("StartEnemyTurn", 2f);
     }
 
     void StartEnemyTurn(){
@@ -131,7 +136,7 @@ public class CombatSystem : MonoBehaviour
         {
             //Proceed to player's turn 
             state = BattleState.PLAYERTURN;
-            PlayerTurn();
+            Invoke("StartPlayerTurn", 2f);
         }
     }
 
@@ -141,17 +146,19 @@ public class CombatSystem : MonoBehaviour
         //Display correct message from outcome of battle
         if (state == BattleState.WON)
         {
-            combatInfo.text = "You live to fight again!";
+            
             
             //Random amount of gold dropped and added to balance.
              goldBalance = 0;                               
                 int goldReward = Random.Range(1,26);                   
                 goldBalance += goldReward;
-                combatInfo.text = ("Recieved" + goldReward + "gold!");
+                combatInfo.text = ("You live to fight again! Recieved " + goldReward + " gold!");
+                Dialogue.text = "Please proceed......";
         }
         else if (state == BattleState.LOST)
         {
             combatInfo.text = "You have died.";
+            Dialogue.text = "You remain lost in the maze.";
         }
     }
    
@@ -177,9 +184,9 @@ public class CombatSystem : MonoBehaviour
 
             //Apply defend action than proceed to enemy's turn
             playerUnit.Defend(); 
-            combatInfo.text = "You are defending against the enemy's attack!";
+            combatInfo.text = "You are defending against the attack!";
             state = BattleState.ENEMYTURN; 
-         EnemyTurn();
+            Invoke("StartEnemyTurn", 2f);
             
 
         
