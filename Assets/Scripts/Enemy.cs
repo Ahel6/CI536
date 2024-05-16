@@ -15,5 +15,6 @@ namespace Assets.Scripts
 		public float MaxHealth;
 		public float CurrentHealth;
 		public Weapon Weapon;
+		public Sprite Sprite;
 	}
 }

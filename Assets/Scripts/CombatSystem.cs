@@ -10,9 +10,9 @@ using static UnityEngine.EventSystems.EventTrigger;
 
 namespace Assets.Scripts
 {
-	public class CombatUI : MonoBehaviour
+	public class CombatSystem : MonoBehaviour
 	{
-		public static CombatUI Instance;
+		public static CombatSystem Instance;
 
 		public Image PlayerHealthbar;
 		public Image EnemyHealthbar;
@@ -23,6 +23,12 @@ namespace Assets.Scripts
 		private string _eventLogString;
 
 		public Enemy Enemy;
+
+		public Button AttackButton;
+		public Button DefendButton;
+		public Button HealButton;
+
+		private BattleState state;
 
 		private void Awake()
 		{
@@ -37,6 +43,8 @@ namespace Assets.Scripts
 			UpdateHealthbars();
 
 			WriteToEventLog($"- Encountered {enemy.Name}!");
+
+			state = BattleState.PLAYERTURN;
 		}
 
 		public void PlayerAttackEnemy(Weapon weapon)
@@ -44,11 +52,30 @@ namespace Assets.Scripts
 			var damage = weapon.Damage;
 
 			WriteToEventLog($"- Player attacked {Enemy.Name} for {damage}!");
+			EnemyTakeDamage(damage);
 		}
 
 		public void EnemyAttackPlayer(Weapon weapon)
 		{
 
+		}
+
+		public void EnemyTakeDamage(float damage)
+		{
+			Enemy.CurrentHealth -= damage;
+
+			if (Enemy.CurrentHealth <= 0)
+			{
+				state = BattleState.WON;
+				// end battle
+			}
+			else
+			{
+				state = BattleState.ENEMYTURN;
+				// invoke start enemy turn
+			}
+
+			UpdateHealthbars();
 		}
 
 		public void UpdateHealthbars()
@@ -123,6 +150,36 @@ namespace Assets.Scripts
 			}
 
 			EventLog.text = finalText;
+		}
+
+		public void OnAttackButton()
+		{
+			if (state != BattleState.PLAYERTURN)
+			{
+				return;
+			}
+
+			PlayerAttackEnemy(Player.Instance.Weapon);
+		}
+
+		public void OnHealButton()
+		{
+			if (state != BattleState.PLAYERTURN)
+			{
+				return;
+			}
+
+
+		}
+
+		public void OnDefendButton()
+		{
+			if (state != BattleState.PLAYERTURN)
+			{
+				return;
+			}
+
+
 		}
 	}
 }

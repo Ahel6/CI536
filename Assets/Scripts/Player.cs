@@ -15,11 +15,11 @@ namespace Assets.Scripts
 	{
 		public static Player Instance;
 
-		public const double Multiplier = 1.3;
-
 		public float MaxHealth = 10;
 		public float Health = 10;
 		public int Gold;
+
+		public Weapon Weapon;
 
 		public MazeCell CurrentCell { get; private set; }
 
@@ -173,7 +173,7 @@ namespace Assets.Scripts
 					UIManager.Instance.ChangeUIState(UIState.COMBAT);
 
 					var enemy = EnemyManager.Instance.Enemies[0];
-					CombatUI.Instance.LoadEnemy(enemy);
+					CombatSystem.Instance.LoadEnemy(enemy);
 				}
 				else if (!_isFadingOut)
 				{

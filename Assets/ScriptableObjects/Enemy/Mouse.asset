@@ -17,3 +17,4 @@ MonoBehaviour:
   MaxHealth: 5
   CurrentHealth: 5
   Weapon: {fileID: 0}
+  Sprite: {fileID: 21300000, guid: 1ed2c55d0940d3d4db51c0d1388415b6, type: 3}
