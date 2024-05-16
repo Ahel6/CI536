@@ -38,6 +38,7 @@ namespace Assets.Scripts
 		public void LoadEnemy(Enemy enemy)
 		{
 			Enemy = enemy;
+			enemy.CurrentHealth = enemy.MaxHealth;
 			EnemyName.text = enemy.Name;
 
 			UpdateHealthbars();
@@ -51,13 +52,33 @@ namespace Assets.Scripts
 		{
 			var damage = weapon.Damage;
 
-			WriteToEventLog($"- Player attacked {Enemy.Name} for {damage}!");
+			WriteToEventLog($"- Player attacked {Enemy.Name} for {damage} damage!");
 			EnemyTakeDamage(damage);
 		}
 
 		public void EnemyAttackPlayer(Weapon weapon)
 		{
+			var damage = weapon.Damage;
 
+			WriteToEventLog($"- {Enemy.Name} attacked for {damage} damage!");
+			PlayerTakeDamage(damage);
+		}
+
+		public void PlayerTakeDamage(float damage)
+		{
+			Player.Instance.Health -= damage;
+
+			if (Player.Instance.Health <= 0)
+			{
+				state = BattleState.LOST;
+				// end battle
+			}
+			else
+			{
+				state = BattleState.PLAYERTURN;
+			}
+
+			UpdateHealthbars();
 		}
 
 		public void EnemyTakeDamage(float damage)
@@ -67,30 +88,62 @@ namespace Assets.Scripts
 			if (Enemy.CurrentHealth <= 0)
 			{
 				state = BattleState.WON;
-				// end battle
+				WriteToEventLog($"- {Enemy.name} was defeated! You win!");
+				WriteToEventLog($"- You earnt 5 gold.");
+				Player.Instance.Gold += 5;
+				Invoke("ExitCombat", 2f);
 			}
 			else
 			{
 				state = BattleState.ENEMYTURN;
-				// invoke start enemy turn
+				Invoke("StartEnemyTurn", 2f);
 			}
 
 			UpdateHealthbars();
 		}
 
+		public void ExitCombat()
+		{
+			ClearEventLog();
+			Player.Instance.ExitCombat();
+		}
+
+		void StartEnemyTurn()
+		{
+			state = BattleState.ENEMYTURN;
+
+			EnemyAttackPlayer(Enemy.Weapon);
+		}
+
 		public void UpdateHealthbars()
 		{
-			PlayerHealthbar.fillAmount = Player.Instance.Health / Player.Instance.MaxHealth;
+			var playerHealth = Player.Instance.Health / Player.Instance.MaxHealth;
+			var redPlayerHealthbar = PlayerHealthbar.transform.GetChild(0).GetComponent<RectTransform>();
+			redPlayerHealthbar.offsetMax = new Vector2(-(2 + (376.49f * (1 -playerHealth))), redPlayerHealthbar.offsetMax.y);
 			PlayerHealthbar.GetComponentInChildren<Text>().text = Player.Instance.Health.ToString();
-			EnemyHealthbar.fillAmount = Enemy.CurrentHealth / Enemy.MaxHealth;
+
+			var enemyHealth = Enemy.CurrentHealth / Enemy.MaxHealth;
+			var redEnemyHealthbar = EnemyHealthbar.transform.GetChild(0).GetComponent<RectTransform>();
+			redEnemyHealthbar.offsetMax = new Vector2(-(2 + (376.49f * (1 - enemyHealth))), redEnemyHealthbar.offsetMax.y);
 			EnemyHealthbar.GetComponentInChildren<Text>().text = Enemy.CurrentHealth.ToString();
 		}
 
 		private const int LINE_COUNT = 14;
-		private const int CHAR_COUNT = 20;
+		private const int CHAR_COUNT = 30;
 
 		private readonly ListStack<string> _messages = new(false);
 		private readonly string[] _lines = new string[LINE_COUNT];
+
+		public void ClearEventLog()
+		{
+			_messages.Clear();
+			for (var i = 0; i < _lines.Length; i++)
+			{
+				_lines[i] = null;
+			}
+
+			EventLog.text = string.Empty;
+		}
 
 		public void WriteToEventLog(string message)
 		{

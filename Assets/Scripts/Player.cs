@@ -67,6 +67,12 @@ namespace Assets.Scripts
 		private bool _descending;
 		private bool _enteringCombat;
 		private bool _inCombat;
+		private bool _exitingCombat;
+
+		public void ExitCombat()
+		{
+			_exitingCombat = true;
+		}
 
 		public void TurnLeft()
 		{
@@ -107,6 +113,7 @@ namespace Assets.Scripts
 
 					if (CurrentCell.IsEnemy)
 					{
+						CurrentCell.IsEnemy = false;
 						_enteringCombat = true;
 					}
 				}
@@ -179,6 +186,22 @@ namespace Assets.Scripts
 				{
 					CanMove = false;
 					_isFadingOut = true;
+				}
+			}
+
+			if (_exitingCombat)
+			{
+				if (_light.intensity == 1)
+				{
+					_inCombat = false;
+					_exitingCombat = false;
+					CanMove = true;
+				}
+				else if (!_isFadingIn)
+				{
+					UIManager.Instance.ChangeUIState(UIState.EXPLORE);
+					_isFadingIn = true;
+					CanMove = false;
 				}
 			}
 		}
