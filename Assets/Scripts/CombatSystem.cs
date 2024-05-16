@@ -98,12 +98,12 @@ namespace Assets.Scripts
 				WriteToEventLog($"- {Enemy.name} was defeated! You win!");
 				WriteToEventLog($"- You earnt 5 gold.");
 				Player.Instance.Gold += 5;
-				Invoke("ExitCombat", 2f);
+				Invoke("ExitCombat", 1f);
 			}
 			else
 			{
 				state = BattleState.ENEMYTURN;
-				Invoke("StartEnemyTurn", 2f);
+				Invoke("StartEnemyTurn", 1f);
 			}
 
 			UpdateHealthbars();
@@ -239,7 +239,7 @@ namespace Assets.Scripts
 			UpdateHealthbars();
 
 			state = BattleState.ENEMYTURN;
-			Invoke("StartEnemyTurn", 2f);
+			Invoke("StartEnemyTurn", 1f);
 		}
 
 		public void OnDefendButton()
@@ -252,7 +252,7 @@ namespace Assets.Scripts
 			WriteToEventLog($"- Player is defending! Damage taken is halfed...");
 			isDefending = true;
 			state = BattleState.ENEMYTURN;
-			Invoke("StartEnemyTurn", 2f);
+			Invoke("StartEnemyTurn", 1f);
 		}
 	}
 }
