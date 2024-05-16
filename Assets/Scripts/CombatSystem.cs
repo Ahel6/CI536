@@ -29,6 +29,7 @@ namespace Assets.Scripts
 		public Button HealButton;
 
 		private BattleState state;
+		private bool isDefending;
 
 		private void Awake()
 		{
@@ -60,6 +61,12 @@ namespace Assets.Scripts
 		{
 			var damage = weapon.Damage;
 
+			if (isDefending)
+			{
+				damage /= 2;
+			}
+
+			isDefending = false;
 			WriteToEventLog($"- {Enemy.Name} attacked for {damage} damage!");
 			PlayerTakeDamage(damage);
 		}
@@ -222,7 +229,17 @@ namespace Assets.Scripts
 				return;
 			}
 
+			WriteToEventLog($"- Player is healing...");
 
+			Player.Instance.Health += 1;
+			if (Player.Instance.Health > Player.Instance.MaxHealth)
+			{
+				Player.Instance.Health = Player.Instance.MaxHealth;
+			}
+			UpdateHealthbars();
+
+			state = BattleState.ENEMYTURN;
+			Invoke("StartEnemyTurn", 2f);
 		}
 
 		public void OnDefendButton()
@@ -232,7 +249,10 @@ namespace Assets.Scripts
 				return;
 			}
 
-
+			WriteToEventLog($"- Player is defending! Damage taken is halfed...");
+			isDefending = true;
+			state = BattleState.ENEMYTURN;
+			Invoke("StartEnemyTurn", 2f);
 		}
 	}
 }
