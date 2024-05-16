@@ -179,25 +179,21 @@ namespace Assets.Scripts
 			if (EndingCell.North != null)
 			{
 				// North connection
-				wallController.ExitObjects.transform.rotation = Quaternion.Euler(0, 0, 0);
 				wallController.SouthHolePlug.SetActive(false);
 			}
 			else if (EndingCell.West != null)
 			{
 				// West connection
-				wallController.ExitObjects.transform.rotation = Quaternion.Euler(0, 90, 0);
 				wallController.EastHolePlug.SetActive(false);
 			}
 			else if (EndingCell.East != null)
 			{
 				// East connection
-				wallController.ExitObjects.transform.rotation = Quaternion.Euler(0, 270, 0);
 				wallController.WestHolePlug.SetActive(false);
 			}
 			else if (EndingCell.South != null)
 			{
 				// South connection
-				wallController.ExitObjects.transform.rotation = Quaternion.Euler(0, 180, 0);
 				wallController.NorthHolePlug.SetActive(false);
 			}
 		}
