@@ -1,13 +1,5 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TMPro;
-using Unity.VisualScripting;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
 
 namespace Assets.Scripts
 {
@@ -20,6 +12,8 @@ namespace Assets.Scripts
 		public int Gold;
 
 		public Weapon Weapon;
+
+		public List<Item> Inventory;
 
 		public MazeCell CurrentCell { get; private set; }
 
@@ -117,7 +111,7 @@ namespace Assets.Scripts
 						_enteringCombat = true;
 					}
 
-					UIManager.Instance.SetShopWindowActive(CurrentCell.IsShop);
+					UIManager.Instance.EnterShopButton.SetActive(CurrentCell.IsShop);
 				}
 			}
 

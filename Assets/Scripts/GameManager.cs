@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using static UnityEditor.Progress;
 
 namespace Assets.Scripts
 {
@@ -202,7 +198,8 @@ namespace Assets.Scripts
 			shopCell.IsShop = true;
 			Debug.Log($"Generating shop at {shopCell.X},{shopCell.Y}");
 
-			// todo - implement
+			var items = new List<Item>() { ItemManager.Instance.Weapons[0], ItemManager.Instance.Weapons[1] };
+			ShopUI.Instance.SetShopInventory(items);
 		}
 
 		private void GenerateEnemies()

@@ -16,6 +16,7 @@ namespace Assets.Scripts
 		public GameObject MapView;
 		public GameObject CombatView;
 		public GameObject ShopView;
+		public GameObject EnterShopButton;
 
 		private void Awake()
 		{
@@ -31,6 +32,7 @@ namespace Assets.Scripts
 
 			MapView.SetActive(false);
 			CombatView.SetActive(false);
+			ShopView.SetActive(false);
 
 			switch (newState)
 			{
@@ -40,20 +42,30 @@ namespace Assets.Scripts
 				case UIState.COMBAT:
 					CombatView.SetActive(true);
 					break;
+				case UIState.SHOP:
+					ShopView.SetActive(true);
+					break;
 			}
 
 			CurrentState = newState;
 		}
 
-		public void SetShopWindowActive(bool active)
+		public void EnterShop()
 		{
-			ShopView.SetActive(active);
+			ChangeUIState(UIState.SHOP);
+			ShopUI.Instance.UpdatePlayerInventory();
+		}
+
+		public void ReturnFromShop()
+		{
+			ChangeUIState(UIState.EXPLORE);
 		}
 	}
 
 	public enum UIState
 	{
 		EXPLORE,
-		COMBAT
+		COMBAT,
+		SHOP
 	}
 }
