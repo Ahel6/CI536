@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
-using static UnityEngine.EventSystems.EventTrigger;
 
 namespace Assets.Scripts
 {
@@ -138,7 +133,7 @@ namespace Assets.Scripts
 		private const int LINE_COUNT = 14;
 		private const int CHAR_COUNT = 30;
 
-		private readonly ListStack<string> _messages = new(false);
+		private readonly ListStack<string> _messages = new();
 		private readonly string[] _lines = new string[LINE_COUNT];
 
 		public void ClearEventLog()
