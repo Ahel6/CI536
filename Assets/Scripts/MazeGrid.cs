@@ -1,13 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Assets.Scripts;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class MazeGrid
 {
 	public bool IsFinished { get; private set; } = false;
 
-	private MazeCell[,] _grid;
+	private readonly MazeCell[,] _grid;
 
 	public MazeGrid(int width, int height, float deadEndLinkChance)
 	{
@@ -23,24 +25,24 @@ public class MazeGrid
 		// Top left of the maze is (0,0)
 
 		// Initialize grid
-		for (var y = 0; y < height; y++)
+		for (int y = 0; y < height; y++)
 		{
-			for (var x = 0; x < width; x++)
+			for (int x = 0; x < width; x++)
 			{
 				_grid[x, y] = new MazeCell(x, y);
 			}
 		}
 
-		var startingCellX = 0;
-		var startingCellY = 0;
+		int startingCellX = 0;
+		int startingCellY = 0;
 
-		var startingCell = _grid[startingCellX, startingCellY];
-		startingCell.vistedByGenerator = true;
+		MazeCell startingCell = _grid[startingCellX, startingCellY];
+		startingCell.visitedByGenerator = true;
 		startingCell.IsStart = true;
 
 		var cellStack = new Stack<MazeCell>();
-		var backtracking = false;
-		var visitedCount = 1;
+		bool backtracking = false;
+		int visitedCount = 1;
 
 		while (true)
 		{
@@ -48,18 +50,18 @@ public class MazeGrid
 			{
 				var current = cellStack.Count > 0 ? cellStack.Peek() : startingCell;
 
-				var (randNeigbour, dir) = GetRandomUnvistedNeighbour(current);
+				var (randNeighbour, dir) = GetRandomUnvisitedNeighbour(current);
 
-				if (randNeigbour == null)
+				if (randNeighbour == null)
 				{
 					Debug.Log($"Reached a dead end.");
 
-					if (UnityEngine.Random.Range(0f, 1f) <= deadEndLinkChance)
+					if (Random.Range(0f, 1f) <= deadEndLinkChance)
 					{
 						Debug.Log($"Trying to link to another cell...");
 
-						// link to random cell to make maze more connected
-						var (connect, connectDir) = GetRandomUnvistedNeighbour(current, true);
+						// Link to random cell to make maze more connected
+						var (connect, connectDir) = GetRandomUnvisitedNeighbour(current, true);
 
 						if (connect != null && connect.X != width - 1 && connect.Y != height - 1)
 						{
@@ -67,66 +69,62 @@ public class MazeGrid
 						}
 					}
 
-					// reached a dead end, backtrack to last cell with unvisited neighbour
+					// Reached a dead end, backtrack to last cell with unvisited neighbour
 					backtracking = true;
 					continue;
 				}
 
-				randNeigbour.vistedByGenerator = true;
+				randNeighbour.visitedByGenerator = true;
 
-				LinkCells(current, randNeigbour, dir);
+				LinkCells(current, randNeighbour, dir);
 
-				cellStack.Push(randNeigbour);
+				cellStack.Push(randNeighbour);
 				visitedCount++;
 
-				if (visitedCount == width * height)
-				{
-					IsFinished = true;
-					break;
-				}
+				if (visitedCount != width * height) continue;
+				IsFinished = true;
+				break;
+			}
+
+			Debug.Log($"Attempting backtrack...");
+
+			if (GetRandomUnvisitedNeighbour(cellStack.Peek()).cell == null)
+			{
+				cellStack.Pop();
 			}
 			else
 			{
-				Debug.Log($"Attempting backtrack...");
-
-				if (GetRandomUnvistedNeighbour(cellStack.Peek()).cell == null)
-				{
-					cellStack.Pop();
-				}
-				else
-				{
-					Debug.Log($"Finished backtrack.");
-					backtracking = false;
-				}
+				Debug.Log($"Finished backtrack.");
+				backtracking = false;
 			}
 		}
 	}
 
-	private (MazeCell cell, CellDirection directionFromCurrent) GetRandomUnvistedNeighbour(MazeCell current, bool includeVisited = false)
+	private (MazeCell cell, CellDirection directionFromCurrent) GetRandomUnvisitedNeighbour(MazeCell current, bool includeVisited = false)
 	{
-		var availableDirections = CellDirection.NORTH | CellDirection.EAST | CellDirection.SOUTH | CellDirection.WEST;
+		CellDirection availableDirections = CellDirection.NORTH | CellDirection.EAST | CellDirection.SOUTH | CellDirection.WEST;
 		ProcessDirection(CellDirection.NORTH);
 		ProcessDirection(CellDirection.EAST);
 		ProcessDirection(CellDirection.SOUTH);
 		ProcessDirection(CellDirection.WEST);
 
-		var matching = Enum.GetValues(typeof(CellDirection))
+		CellDirection[] matching = Enum.GetValues(typeof(CellDirection))
 				   .Cast<CellDirection>()
 				   .Where(dir => availableDirections.HasFlag(dir) && dir != CellDirection.NONE)
 				   .ToArray();
 
-		if (matching == null || matching.Length == 0)
+		if (matching.Length == 0)
 		{
 			return (null, CellDirection.NORTH);
 		}
 
-		var randomAvailableDirection = matching[new System.Random().Next(matching.Length)];
+		CellDirection randomAvailableDirection = matching[Random.Range(0, matching.Length)];
 
 		return (GetCellInDirection(current, randomAvailableDirection), randomAvailableDirection);
 
 		void ProcessDirection(CellDirection direction)
 		{
-			var cell = GetCellInDirection(current, direction);
+			MazeCell cell = GetCellInDirection(current, direction);
 
 			if (includeVisited)
 			{
@@ -137,12 +135,11 @@ public class MazeGrid
 			}
 			else
 			{
-				if (cell == null || cell.vistedByGenerator)
+				if (cell == null || cell.visitedByGenerator)
 				{
 					availableDirections &= ~direction;
 				}
 			}
-			
 		}
 	}
 
@@ -161,7 +158,7 @@ public class MazeGrid
 		};
 	}
 
-	private void LinkCells(MazeCell cellA, MazeCell cellB, CellDirection dir)
+	private static void LinkCells(MazeCell cellA, MazeCell cellB, CellDirection dir)
 	{
 		Debug.Log($"Linking {cellA} {dir} to {cellB}");
 		switch (dir)
@@ -182,6 +179,10 @@ public class MazeGrid
 				cellA.West = cellB;
 				cellB.East = cellA;
 				break;
+			case CellDirection.NONE:
+				break;
+			default:
+				throw new ArgumentOutOfRangeException(nameof(dir), dir, "Invalid direction.");
 		}
 	}
 }

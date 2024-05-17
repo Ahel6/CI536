@@ -14,7 +14,7 @@ namespace Assets.Scripts
 		public GameObject PlayerRoot;
 		public Text GoldText;
 
-		void Awake()
+		private void Awake()
 		{
 			Debug.Log($"Awake!");
 			Instance = this;
@@ -28,16 +28,16 @@ namespace Assets.Scripts
 			UpdateShopInventory();
 		}
 
-		public void UpdateShopInventory()
+		private void UpdateShopInventory()
 		{
 			foreach (Transform child in ShopRoot.transform)
 			{
 				Destroy(child.gameObject);
 			}
 
-			foreach (var item in shopInventory)
+			foreach (Item item in shopInventory)
 			{
-				var instance = Instantiate(ItemPrefab, ShopRoot.transform);
+				GameObject instance = Instantiate(ItemPrefab, ShopRoot.transform);
 				instance.transform.Find("Name").GetComponent<Text>().text = item.ItemName;
 				instance.transform.Find("Price").GetComponent<Text>().text = $"Price: {item.BuyValue}";
 
@@ -52,9 +52,9 @@ namespace Assets.Scripts
 				Destroy(child.gameObject);
 			}
 
-			foreach (var item in Player.Instance.Inventory)
+			foreach (Item item in Player.Instance.Inventory)
 			{
-				var instance = Instantiate(ItemPrefab, PlayerRoot.transform);
+				GameObject instance = Instantiate(ItemPrefab, PlayerRoot.transform);
 				instance.transform.Find("Name").GetComponent<Text>().text = item.ItemName;
 				instance.transform.Find("Price").GetComponent<Text>().text = $"Value: {item.SellValue}";
 
@@ -64,7 +64,7 @@ namespace Assets.Scripts
 			GoldText.text = $"Gold: {Player.Instance.Gold}";
 		}
 
-		public void BuyItem(Item item)
+		private void BuyItem(Item item)
 		{
 			if (Player.Instance.Gold < item.BuyValue)
 			{
@@ -74,15 +74,17 @@ namespace Assets.Scripts
 			Player.Instance.Gold -= item.BuyValue;
 			shopInventory.Remove(item);
 			Player.Instance.Inventory.Add(item);
+			
 			UpdatePlayerInventory();
 			UpdateShopInventory();
 		}
 
-		public void SellItem(Item item)
+		private void SellItem(Item item)
 		{
 			Player.Instance.Gold += item.SellValue;
 			Player.Instance.Inventory.Remove(item);
 			shopInventory.Add(item);
+			
 			UpdatePlayerInventory();
 			UpdateShopInventory();
 		}

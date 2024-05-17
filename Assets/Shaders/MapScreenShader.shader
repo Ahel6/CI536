@@ -7,7 +7,7 @@ Shader "Unlit/MapScreenShader"
     }
     SubShader
     {
-        Tags { "RenderType"="Opaque" }
+        Tags { "RenderType" = "Opaque" }
         LOD 100
 
         Pass
@@ -43,7 +43,7 @@ Shader "Unlit/MapScreenShader"
                 return o;
             }
 
-            fixed4 frag (v2f i) : SV_Target
+            fixed4 frag (const v2f i) : SV_Target
             {
                 fixed4 col = tex2D(_MainTex, i.uv);
 

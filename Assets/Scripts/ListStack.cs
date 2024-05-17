@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public class ListStack<T> : IEnumerable<T>
 {
-	private List<T> _items = new();
+	private readonly List<T> _items = new();
 
 	public int Count => _items.Count;
 
@@ -37,5 +37,6 @@ public class ListStack<T> : IEnumerable<T>
 	}
 
 	IEnumerator<T> IEnumerable<T>.GetEnumerator() => ((IEnumerable<T>)_items).GetEnumerator();
+	
 	public IEnumerator GetEnumerator() => ((IEnumerable<T>)_items).GetEnumerator();
 }

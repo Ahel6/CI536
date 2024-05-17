@@ -73,9 +73,9 @@ Shader "Standard Triplanar"
                 float2 tz = IN.localCoord.xy * _MapScale;
 
                 // Base color
-                half4 cx = tex2D(_MainTex, tx) * bf.x;
-                half4 cy = tex2D(_MainTex, ty) * bf.y;
-                half4 cz = tex2D(_MainTex, tz) * bf.z;
+                const half4 cx = tex2D(_MainTex, tx) * bf.x;
+                const half4 cy = tex2D(_MainTex, ty) * bf.y;
+                const half4 cz = tex2D(_MainTex, tz) * bf.z;
                 half4 color = (cx + cy + cz) * _Color;
                 o.Albedo = color.rgb;
                 o.Alpha = color.a;

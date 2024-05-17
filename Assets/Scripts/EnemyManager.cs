@@ -13,10 +13,5 @@ namespace Assets.Scripts
 		{
 			Instance = this;
 		}
-
-		private void Start()
-		{
-
-		}
 	}
 }

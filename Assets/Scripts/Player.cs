@@ -20,39 +20,7 @@ namespace Assets.Scripts
 		public bool CanMove;
 
 		private Light _light;
-
-		private void Start()
-		{
-			Instance = this;
-			CanMove = true;
-			_light = GetComponentInChildren<Light>();
-		}
-
-		public CellDirection GetCurrentDirection()
-		{
-			var modAngle = Mathf.RoundToInt(transform.rotation.eulerAngles.y % 360);
-			if (modAngle == 0)
-			{
-				return CellDirection.NORTH;
-			}
-			else if (modAngle == 90)
-			{
-				return CellDirection.EAST;
-			}
-			else if (modAngle == 180)
-			{
-				return CellDirection.SOUTH;
-			}
-			else if (modAngle == 270)
-			{
-				return CellDirection.WEST;
-			}
-			else
-			{
-				return CellDirection.NONE;
-			}
-		}
-
+		
 		private bool _movingToCell;
 		private bool _turning;
 		private float _targetRotation;
@@ -62,6 +30,26 @@ namespace Assets.Scripts
 		private bool _enteringCombat;
 		private bool _inCombat;
 		private bool _exitingCombat;
+
+		private void Start()
+		{
+			Instance = this;
+			CanMove = true;
+			_light = GetComponentInChildren<Light>();
+		}
+
+		private CellDirection GetCurrentDirection()
+		{
+			var modAngle = Mathf.RoundToInt(transform.rotation.eulerAngles.y % 360);
+			return modAngle switch
+			{
+				0 => CellDirection.NORTH,
+				90 => CellDirection.EAST,
+				180 => CellDirection.SOUTH,
+				270 => CellDirection.WEST,
+				_ => CellDirection.NONE
+			};
+		}
 
 		public void ExitCombat()
 		{
@@ -94,7 +82,7 @@ namespace Assets.Scripts
 		{
 			if (_movingToCell)
 			{
-				var targetPosition = CurrentCell.WorldPosition;
+				Vector3 targetPosition = CurrentCell.WorldPosition;
 				var newPos = Vector3.MoveTowards(transform.position, targetPosition, Time.deltaTime * 10);
 				transform.position = newPos;
 
@@ -117,7 +105,7 @@ namespace Assets.Scripts
 
 			if (_turning)
 			{
-				var newRotation = Mathf.MoveTowardsAngle(transform.localEulerAngles.y, _targetRotation, Time.deltaTime * 240);
+				float newRotation = Mathf.MoveTowardsAngle(transform.localEulerAngles.y, _targetRotation, Time.deltaTime * 240);
 				transform.localEulerAngles = new Vector3(0, newRotation, 0);
 
 				if (Mathf.Approximately(_targetRotation, newRotation))
@@ -154,8 +142,8 @@ namespace Assets.Scripts
 			{
 				if (_light.intensity == 0)
 				{
-					var currentWidth = GameManager.Instance.Maze.GetCellArray().GetLength(0);
-					var currentHeight = GameManager.Instance.Maze.GetCellArray().GetLength(0);
+					int currentWidth = GameManager.Instance.Maze.GetCellArray().GetLength(0);
+					int currentHeight = GameManager.Instance.Maze.GetCellArray().GetLength(0);
 					GameManager.Instance.StartNewLayer(currentWidth + 1, currentHeight + 1);
 					_isFadingIn = true;
 					_descending = false;
@@ -185,20 +173,19 @@ namespace Assets.Scripts
 				}
 			}
 
-			if (_exitingCombat)
+			if (!_exitingCombat) return;
+			
+			if (Mathf.Approximately(_light.intensity, 1))
 			{
-				if (_light.intensity == 1)
-				{
-					_inCombat = false;
-					_exitingCombat = false;
-					CanMove = true;
-				}
-				else if (!_isFadingIn)
-				{
-					UIManager.Instance.ChangeUIState(UIState.EXPLORE);
-					_isFadingIn = true;
-					CanMove = false;
-				}
+				_inCombat = false;
+				_exitingCombat = false;
+				CanMove = true;
+			}
+			else if (!_isFadingIn)
+			{
+				UIManager.Instance.ChangeUIState(UIState.EXPLORE);
+				_isFadingIn = true;
+				CanMove = false;
 			}
 		}
 
@@ -219,7 +206,7 @@ namespace Assets.Scripts
 		{
 			if (GameManager.Instance.EndingCell != CurrentCell)
 			{
-				Debug.LogError($"Can't ExitLayer() when not in exit!");
+				Debug.LogError("Can't ExitLayer() when not in exit!");
 				return;
 			}
 
@@ -245,7 +232,7 @@ namespace Assets.Scripts
 			CurrentCell = GameManager.Instance.Maze.GetCellArray()[x, y];
 		}
 
-		public void MoveToCell(MazeCell cell, bool instantly = false)
+		private void MoveToCell(MazeCell cell, bool instantly = false)
 		{
 			if (_movingToCell || (!CanMove && !instantly))
 			{

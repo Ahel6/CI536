@@ -81,13 +81,12 @@ namespace Assets.Scripts
 
 			mazeParent = new GameObject("MazeParent");
 
-			foreach (var item in Maze.GetCellArray())
+			foreach (MazeCell item in Maze.GetCellArray())
 			{
-				var newPrefab = Instantiate(CellPrefab, mazeParent.transform);
+				GameObject newPrefab = Instantiate(CellPrefab, mazeParent.transform);
 				newPrefab.transform.position = item.WorldPosition;
 
 				var wallController = newPrefab.GetComponent<CellWallContainer>();
-
 				item.prefab = wallController;
 
 				if (item.North != null)
@@ -120,11 +119,11 @@ namespace Assets.Scripts
 		private void GenerateEndCell()
 		{
 			// Starting with starting cell, assign each travelled cell an incrementally higher number
-			// Cell with highest number is the furthest cell away from the start.
+			// Cell with the highest number is the furthest cell away from the start.
 
-			var cellArray = Maze.GetCellArray();
+			MazeCell[,] cellArray = Maze.GetCellArray();
 
-			var startingCell = cellArray[0, 0];
+			MazeCell startingCell = cellArray[0, 0];
 			startingCell.depthValue = 0;
 
 			var currentCells = new List<MazeCell> { startingCell };
@@ -132,10 +131,10 @@ namespace Assets.Scripts
 
 			while (cellArray.Cast<MazeCell>().ToList().Any(x => x.depthValue == -1))
 			{
-				foreach (var item in currentCells)
+				foreach (MazeCell item in currentCells)
 				{
-					var connectingCells = item.GetConnectingCells();
-					foreach (var connect in connectingCells)
+					MazeCell[] connectingCells = item.GetConnectingCells();
+					foreach (MazeCell connect in connectingCells)
 					{
 						if (connect.depthValue == -1)
 						{
@@ -153,8 +152,7 @@ namespace Assets.Scripts
 			EndingCell.IsExit = true;
 			Debug.Log($"Generating exit at {EndingCell.X},{EndingCell.Y}");
 
-			var wallController = EndingCell.prefab;
-
+			CellWallContainer wallController = EndingCell.prefab;
 			wallController.ExitObjects.SetActive(true);
 
 			if (EndingCell.North != null)
@@ -183,38 +181,37 @@ namespace Assets.Scripts
 		{
 			// Generate shop halfway through maze
 
-			var startingDepth = 0;
-			var endingDepth = EndingCell.depthValue;
-			var midpoint = (endingDepth - startingDepth) / 2;
+			int endingDepth = EndingCell.depthValue;
+			int midpoint = endingDepth / 2;
 
-			var possibleShopLocations = Maze.GetCellArray().Cast<MazeCell>().ToList().Where(x => x.depthValue == midpoint && !x.IsStart && !x.IsExit).ToList();
+			List<MazeCell> possibleShopLocations = Maze.GetCellArray().Cast<MazeCell>().ToList().Where(x => x.depthValue == midpoint && !x.IsStart && !x.IsExit).ToList();
 
 			if (possibleShopLocations.Count == 0)
 			{
 				return;
 			}
 
-			var shopCell = possibleShopLocations[UnityEngine.Random.Range(0, possibleShopLocations.Count)];
+			MazeCell shopCell = possibleShopLocations[Random.Range(0, possibleShopLocations.Count)];
 			shopCell.IsShop = true;
 			Debug.Log($"Generating shop at {shopCell.X},{shopCell.Y}");
 
-			var items = new List<Item>() { ItemManager.Instance.Weapons[0], ItemManager.Instance.Weapons[1] };
+			var items = new List<Item> { ItemManager.Instance.Weapons[0], ItemManager.Instance.Weapons[1] };
 			ShopUI.Instance.SetShopInventory(items);
 		}
 
 		private void GenerateEnemies()
 		{
-			var numberOfEnemies = Maze.GetCellArray().GetLength(0) - 2;
-			var possibleCells = Maze.GetCellArray().Cast<MazeCell>().ToList().Where(x => !x.IsExit && !x.IsShop && !x.IsStart).ToList();
+			int numberOfEnemies = Maze.GetCellArray().GetLength(0) - 2;
+			List<MazeCell> possibleCells = Maze.GetCellArray().Cast<MazeCell>().ToList().Where(x => !x.IsExit && !x.IsShop && !x.IsStart).ToList();
 
-			for (var i = 0; i < numberOfEnemies; i++)
+			for (int i = 0; i < numberOfEnemies; i++)
 			{
 				if (possibleCells.Count == 0)
 				{
 					break;
 				}
 
-				var cell = possibleCells[UnityEngine.Random.Range(0, possibleCells.Count)];
+				MazeCell cell = possibleCells[Random.Range(0, possibleCells.Count)];
 				Debug.Log($"Generating enemy at {cell.X},{cell.Y}");
 				cell.IsEnemy = true;
 				possibleCells.Remove(cell);
@@ -230,7 +227,7 @@ namespace Assets.Scripts
 
 			Gizmos.color = Color.white;
 
-			foreach (var item in Maze.GetCellArray())
+			foreach (MazeCell item in Maze.GetCellArray())
 			{
 				if (item.IsStart)
 				{

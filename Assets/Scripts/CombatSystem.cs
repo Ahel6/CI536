@@ -44,17 +44,17 @@ namespace Assets.Scripts
 			state = BattleState.PLAYERTURN;
 		}
 
-		public void PlayerAttackEnemy(Weapon weapon)
+		private void PlayerAttackEnemy(Weapon weapon)
 		{
-			var damage = weapon.Damage;
+			float damage = weapon.Damage;
 
 			WriteToEventLog($"- Player attacked {Enemy.Name} for {damage} damage!");
 			EnemyTakeDamage(damage);
 		}
 
-		public void EnemyAttackPlayer(Weapon weapon)
+		private void EnemyAttackPlayer(Weapon weapon)
 		{
-			var damage = weapon.Damage;
+            float damage = weapon.Damage;
 
 			if (isDefending)
 			{
@@ -66,7 +66,7 @@ namespace Assets.Scripts
 			PlayerTakeDamage(damage);
 		}
 
-		public void PlayerTakeDamage(float damage)
+		private void PlayerTakeDamage(float damage)
 		{
 			Player.Instance.Health -= damage;
 
@@ -83,7 +83,7 @@ namespace Assets.Scripts
 			UpdateHealthbars();
 		}
 
-		public void EnemyTakeDamage(float damage)
+		private void EnemyTakeDamage(float damage)
 		{
 			Enemy.CurrentHealth -= damage;
 
@@ -91,14 +91,14 @@ namespace Assets.Scripts
 			{
 				state = BattleState.WON;
 				WriteToEventLog($"- {Enemy.name} was defeated! You win!");
-				WriteToEventLog($"- You earnt 5 gold.");
+				WriteToEventLog($"- You earned 5 gold.");
 				Player.Instance.Gold += 5;
-				Invoke("ExitCombat", 1f);
+				Invoke(nameof(ExitCombat), 1f);
 			}
 			else
 			{
 				state = BattleState.ENEMYTURN;
-				Invoke("StartEnemyTurn", 1f);
+				Invoke(nameof(StartEnemyTurn), 1f);
 			}
 
 			UpdateHealthbars();
@@ -110,21 +110,21 @@ namespace Assets.Scripts
 			Player.Instance.ExitCombat();
 		}
 
-		void StartEnemyTurn()
+		private void StartEnemyTurn()
 		{
 			state = BattleState.ENEMYTURN;
 
 			EnemyAttackPlayer(Enemy.Weapon);
 		}
 
-		public void UpdateHealthbars()
+		private void UpdateHealthbars()
 		{
-			var playerHealth = Player.Instance.Health / Player.Instance.MaxHealth;
+			float playerHealth = Player.Instance.Health / Player.Instance.MaxHealth;
 			var redPlayerHealthbar = PlayerHealthbar.transform.GetChild(0).GetComponent<RectTransform>();
-			redPlayerHealthbar.offsetMax = new Vector2(-(2 + (376.49f * (1 -playerHealth))), redPlayerHealthbar.offsetMax.y);
+			redPlayerHealthbar.offsetMax = new Vector2(-(2 + (376.49f * (1 - playerHealth))), redPlayerHealthbar.offsetMax.y);
 			PlayerHealthbar.GetComponentInChildren<Text>().text = Player.Instance.Health.ToString();
 
-			var enemyHealth = Enemy.CurrentHealth / Enemy.MaxHealth;
+			float enemyHealth = Enemy.CurrentHealth / Enemy.MaxHealth;
 			var redEnemyHealthbar = EnemyHealthbar.transform.GetChild(0).GetComponent<RectTransform>();
 			redEnemyHealthbar.offsetMax = new Vector2(-(2 + (376.49f * (1 - enemyHealth))), redEnemyHealthbar.offsetMax.y);
 			EnemyHealthbar.GetComponentInChildren<Text>().text = Enemy.CurrentHealth.ToString();
@@ -136,10 +136,10 @@ namespace Assets.Scripts
 		private readonly ListStack<string> _messages = new();
 		private readonly string[] _lines = new string[LINE_COUNT];
 
-		public void ClearEventLog()
+		private void ClearEventLog()
 		{
 			_messages.Clear();
-			for (var i = 0; i < _lines.Length; i++)
+			for (int i = 0; i < _lines.Length; i++)
 			{
 				_lines[i] = null;
 			}
@@ -147,7 +147,7 @@ namespace Assets.Scripts
 			EventLog.text = string.Empty;
 		}
 
-		public void WriteToEventLog(string message)
+		private void WriteToEventLog(string message)
 		{
 			_messages.Push(message);
 
@@ -156,14 +156,14 @@ namespace Assets.Scripts
 				_messages.PopFromBack();
 			}
 
-			var currentLineIndex = LINE_COUNT - 1;
+			int currentLineIndex = LINE_COUNT - 1;
 
-			foreach (var msg in _messages.Reverse())
+			foreach (string msg in _messages.Reverse())
 			{
-				var characterCount = msg.Length;
-				var linesNeeded = Mathf.CeilToInt((float)characterCount / CHAR_COUNT);
-				var chunk = 0;
-				for (var i = linesNeeded - 1; i >= 0; i--)
+				int characterCount = msg.Length;
+				int linesNeeded = Mathf.CeilToInt((float)characterCount / CHAR_COUNT);
+				int chunk = 0;
+				for (int i = linesNeeded - 1; i >= 0; i--)
 				{
 					if (currentLineIndex - i < 0)
 					{
@@ -184,24 +184,21 @@ namespace Assets.Scripts
 				}
 			}
 
-			var finalText = "";
-			foreach (var line in _lines)
+			string finalText = "";
+			foreach (string line in _lines)
 			{
-				var msg = line;
-
 				if (line == default)
 				{
 					finalText += Environment.NewLine;
 				}
-				else if (msg.Length == CHAR_COUNT + 1)
+				else if (line.Length == CHAR_COUNT + 1)
 				{
-					finalText += msg;
+					finalText += line;
 				}
 				else
 				{
-					finalText += $"{msg}{Environment.NewLine}";
+					finalText += $"{line}{Environment.NewLine}";
 				}
-
 			}
 
 			EventLog.text = finalText;
@@ -231,10 +228,10 @@ namespace Assets.Scripts
 			{
 				Player.Instance.Health = Player.Instance.MaxHealth;
 			}
-			UpdateHealthbars();
 
+			UpdateHealthbars();
 			state = BattleState.ENEMYTURN;
-			Invoke("StartEnemyTurn", 1f);
+			Invoke(nameof(StartEnemyTurn), 1f);
 		}
 
 		public void OnDefendButton()
@@ -244,10 +241,10 @@ namespace Assets.Scripts
 				return;
 			}
 
-			WriteToEventLog($"- Player is defending! Damage taken is halfed...");
+			WriteToEventLog($"- Player is defending! Damage taken is halved...");
 			isDefending = true;
 			state = BattleState.ENEMYTURN;
-			Invoke("StartEnemyTurn", 1f);
+			Invoke(nameof(StartEnemyTurn), 1f);
 		}
 	}
 }

@@ -2,6 +2,7 @@ using Assets.Scripts;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [Serializable]
 public class MazeCell
@@ -25,24 +26,22 @@ public class MazeCell
 	public MazeCell South;
 	public MazeCell West;
 
-	public bool vistedByGenerator;
+	[FormerlySerializedAs("vistedByGenerator")] public bool visitedByGenerator; // FIXME in editor
 	public int depthValue = -1;
 
 	public CellWallContainer prefab;
 
 	public Vector3 WorldPosition => new(X * 3, 0, Y * -3);
+	
+	// store other info here, like if this is a shop etc
+	public bool IsStart;
+	public bool IsExit;
+	public bool IsShop;
+	public bool IsEnemy;
 
 	public MazeCell[] GetConnectingCells()
 	{
 		var cellList = new List<MazeCell>();
-
-		void AddCellToList(MazeCell cell)
-		{
-			if (cell != null)
-			{
-				cellList.Add(cell);
-			}
-		}
 
 		AddCellToList(North);
 		AddCellToList(East);
@@ -50,21 +49,20 @@ public class MazeCell
 		AddCellToList(West);
 
 		return cellList.ToArray();
+		
+		void AddCellToList(MazeCell cell)
+		{
+			if (cell != null)
+			{
+				cellList.Add(cell);
+			}
+		}
 	}
 
 	public bool LinkedTo(MazeCell cell)
 	{
-		if (North == cell || East == cell || South == cell || West == cell)
-		{
-			return true;
-		}
-
-		if (cell.North == this || cell.East == this || cell.South == this || cell.West == this)
-		{
-			return true;
-		}
-
-		return false;
+		return North == cell || East == cell || South == cell || West == cell || cell.North == this ||
+		       cell.East == this || cell.South == this || cell.West == this;
 	}
 
 	public MazeCell GetCellInDirection(CellDirection dir)
@@ -79,15 +77,5 @@ public class MazeCell
 		};
 	}
 
-	public bool IsDeadEnd()
-	{
-		return GetConnectingCells().Length == 1;
-	}
-
-	// store other info here, like if this is a shop etc
-
-	public bool IsStart;
-	public bool IsExit;
-	public bool IsShop;
-	public bool IsEnemy;
+	public bool IsDeadEnd() => GetConnectingCells().Length == 1;
 }
